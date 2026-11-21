@@ -340,10 +340,14 @@ function fit(grid) {
   const cols = +grid.dataset.cols, rows = +grid.dataset.rows;
   const gaps = +grid.dataset.gaps, rgaps = +grid.dataset.rgaps;
   if (!cols || !rows) return;
-  const box = grid.parentElement.getBoundingClientRect();
-  const other = Array.from(grid.parentElement.children)
-    .filter((c) => c !== grid).reduce((h, c) => h + c.getBoundingClientRect().height, 0);
-  const availW = box.width - 8;
+  // 쓸 수 있는 공간은 .fit-host 기준. 격자 옆(.side)은 너비에서, 위아래 요소는 높이에서 뺀다.
+  const host = grid.closest('.fit-host') || grid.parentElement;
+  const box = host.getBoundingClientRect();
+  const sibs = Array.from(grid.parentElement.children).filter((c) => c !== grid);
+  const isSide = (c) => c.classList.contains('side');
+  const other = sibs.filter((c) => !isSide(c)).reduce((h, c) => h + c.getBoundingClientRect().height, 0);
+  const sideW = sibs.filter(isSide).reduce((w, c) => w + c.getBoundingClientRect().width + 24, 0);
+  const availW = box.width - 8 - sideW;
   const availH = box.height - other - 16;
   // 짝·모둠은 책상 안 간격을 좁게, 책상 사이(통로)는 넓게
   const tight = grid.dataset.preset !== 'single';
@@ -604,6 +608,7 @@ function renderRoster() {
   $('#roster-msg').className = S.view.roster_error ? 'msg error' : 'msg';
   $('#roster-msg').textContent = S.view.roster_error || '';
   S.rosterDirty = false;
+  $('#btn-roster-next').hidden = true;
   countRoster();
 }
 
@@ -614,6 +619,8 @@ async function saveRoster() {
     applyView(await invoke('save_roster', { males: split($('#roster-m').value), females: split($('#roster-f').value) }));
     renderRoster();
     $('#roster-msg').textContent = `저장했어요 (${S.view.students.length}명)`;
+    // 저장하면 다음 할 일(교실 설정)로 가는 버튼을 보여 준다
+    $('#btn-roster-next').hidden = !S.view.students.length;
     return true;
   } catch (e) {
     $('#roster-msg').className = 'msg error';
@@ -644,13 +651,21 @@ function setup() {
   $$('[data-action="quit"]').forEach((b) => (b.onclick = tryQuit));
   $('#btn-add-class').onclick = addClass;
   $('#btn-save-roster').onclick = saveRoster;
+  $('#btn-roster-next').onclick = () => go('room');
   for (const id of ['#roster-m', '#roster-f']) {
-    $(id).oninput = () => { S.rosterDirty = true; countRoster(); $('#roster-msg').textContent = ''; };
+    $(id).oninput = () => {
+      S.rosterDirty = true;
+      countRoster();
+      $('#roster-msg').textContent = '';
+      $('#btn-roster-next').hidden = true;
+    };
   }
   $('#new-class').onkeydown = (e) => { if (e.key === 'Enter') addClass(); };
   $('#btn-open-class').onclick = openSelected;
   $('#btn-save-req').onclick = saveRequests;
   $('#btn-req-next').onclick = arrange;
+  // 교실 설정으로 돌아간다 (요청은 go()가 저장해 두므로 그대로 남는다)
+  $('#btn-req-back').onclick = () => go('room');
   $('#btn-start').onclick = startArranging;
   $('#btn-arrange').onclick = arrange;
   $('#btn-rearrange').onclick = arrange;

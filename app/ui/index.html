@@ -55,6 +55,7 @@
     <div class="bottom-bar">
       <p id="roster-msg" class="msg"></p>
       <button id="btn-save-roster" class="primary">저장</button>
+      <button id="btn-roster-next" class="primary" hidden>교실 설정으로</button>
     </div>
   </section>
 
@@ -100,13 +101,15 @@
     </div>
     <p id="room-msg" class="msg warn"></p>
     <div class="room-wrap">
-      <div class="side-label left">창문</div>
-      <div class="room-center">
-        <div class="front-row"><span class="podium">교탁</span><span class="board">칠판</span><span class="door">앞문</span></div>
-        <div id="room-grid" class="grid editable"></div>
-        <div class="back-row"><span class="door">뒷문</span></div>
+      <!-- 창문·문은 화면 끝이 아니라 자리 바로 옆에 붙인다 -->
+      <div class="room-center fit-host">
+        <div class="room-box">
+          <div class="front-row"><span class="podium">교탁</span><span class="board">칠판</span></div>
+          <div class="side left">창문</div>
+          <div id="room-grid" class="grid editable"></div>
+          <div class="side right"><span class="door">앞문</span><span class="door">뒷문</span></div>
+        </div>
       </div>
-      <div class="side-label right"></div>
     </div>
     <p class="hint">칸을 누르면 자리 → 빈자리 → 통로 순서로 바뀌어요.</p>
   </section>
@@ -117,6 +120,7 @@
     <p id="req-msg" class="msg warn"></p>
     <div id="req-list" class="req-list"></div>
     <div class="bottom-bar">
+      <button id="btn-req-back" class="secondary">이전</button>
       <span id="req-saved" class="saved"></span>
       <button id="btn-save-req" class="secondary">저장</button>
       <button id="btn-req-next" class="primary big">자리 배치</button>

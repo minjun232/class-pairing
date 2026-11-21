@@ -84,7 +84,8 @@ nav .nav-class { font-weight: 800; font-size: 1.1em; }
 nav .tabs { display: flex; gap: .3em; margin: 0 0 0 1em; }
 nav .nav-start, nav .steps { margin-left: auto; margin-right: auto; }
 .steps { display: flex; gap: .4em; list-style: none; padding: 0; margin: 0; font-size: .9em; color: var(--ink-soft); }
-.steps li + li::before { content: '→'; margin-right: .4em; }
+/* 순서는 보여 주지 않고 지금 단계 이름만 */
+.steps li:not(.on) { display: none; }
 .steps li.on { color: var(--accent); font-weight: 800; }
 nav .tabs button { font-weight: 600; color: var(--ink-soft); }
 nav .tabs button.active { background: var(--accent-soft); color: var(--accent); }
@@ -132,28 +133,33 @@ nav .tabs button.active { background: var(--accent-soft); color: var(--accent); 
 .count { color: var(--ink-soft); }
 .hint { text-align: center; color: var(--ink-soft); font-size: .85em; margin: .5vh 0 0; }
 
-.room-wrap { flex: 1; display: flex; align-items: stretch; gap: 1vw; min-height: 0; }
-.room-center { flex: 1; display: flex; flex-direction: column; align-items: center; min-height: 0; min-width: 0; }
-.side-label {
-  writing-mode: vertical-rl;
-  color: var(--ink-soft);
-  font-size: .8em;
-  display: flex; align-items: center; justify-content: center;
-  width: 2em;
+.room-wrap { flex: 1; display: flex; align-items: stretch; min-height: 0; }
+.room-center { flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+/* 칠판·교탁은 자리 위, 창문은 왼쪽, 앞문·뒷문은 오른쪽에 자리와 붙여 둔다 */
+.room-box {
+  margin: auto;
+  display: grid; grid-template-areas: ". front ." "left grid right";
+  column-gap: .8vw; row-gap: .6vh;
 }
-.side-label.left { border-left: 6px solid #bfdbfe; }
-.front-row, .back-row {
-  width: 100%;
-  display: flex; align-items: center; justify-content: space-between;
+.room-box .grid { grid-area: grid; margin: 0; }
+.front-row {
+  grid-area: front;
+  display: grid; grid-template-columns: 1fr 40% 1fr; align-items: center;
   font-size: .8em; color: var(--ink-soft);
-  margin: .6vh 0;
 }
 .front-row .board {
-  flex: 0 1 40%; text-align: center; background: #334155; color: #fff;
+  grid-column: 2; text-align: center; background: #334155; color: #fff;
   border-radius: var(--radius); padding: .3em 0; font-weight: 700;
 }
-.podium, .door { padding: .2em .8em; border: 2px dashed var(--line); border-radius: var(--radius); }
-.back-row { justify-content: flex-end; }
+.front-row .podium { grid-column: 1; justify-self: start; }
+.side { font-size: .8em; color: var(--ink-soft); display: flex; }
+.side.left {
+  grid-area: left; writing-mode: vertical-rl;
+  align-items: center; justify-content: center;
+  padding-left: .3em; border-left: 6px solid #bfdbfe;
+}
+.side.right { grid-area: right; flex-direction: column; justify-content: space-between; }
+.podium, .door { padding: .2em .8em; border: 2px dashed var(--line); border-radius: var(--radius); white-space: nowrap; }
 
 /* ---------- 좌석 격자 (②, ④ 공통) ---------- */
 .grid { display: grid; gap: var(--gap); margin: auto; }
