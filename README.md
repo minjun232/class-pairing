@@ -4,6 +4,11 @@
 
 교사가 평소 말투로 적은 조건("철수랑 영희 멀리", "민수 시력 안 좋음")을 프로그램에 내장된 소형 LLM이 규칙으로 바꾸고, 알고리즘이 그 규칙을 지키는 무작위 배치를 만듭니다. 결과는 전자칠판에서 한 명씩 공개합니다. 설치, 계정, 서버, API 키가 필요 없습니다.
 
+## 내려받기
+**[자리배치 내려받기 (Windows, zip)](https://github.com/minjun232/class-pairing/releases/latest/download/jaribaechi-windows.zip)**
+
+압축을 풀고 `자리배치` 폴더 안의 `자리배치.exe`를 실행하세요. 설치는 필요 없습니다. 이전 버전은 [Releases](https://github.com/minjun232/class-pairing/releases)에 있습니다.
+
 ## 문서
 - [사용설명서 (원본 HTML)](docs/manual/사용설명서.html)
 
@@ -21,7 +26,7 @@
 cargo test --workspace --release
 ```
 
-Windows용 배포 파일(`자리배치.zip`)은 GitHub Actions의 "배포 파일 만들기 (Windows)" 워크플로가 만듭니다.
+Windows용 배포 파일은 GitHub Actions의 "배포 파일 만들기 (Windows)" 워크플로가 만듭니다. `v*` 태그를 push하면 Releases에 `jaribaechi-windows.zip`으로 올라갑니다.
 
 ## 라이선스
 [MIT License](LICENSE) — 누구나 무료로 쓰고, 고치고, 다시 배포할 수 있습니다. 함께 배포하는 모델(Qwen2.5, Apache 2.0)과 라이브러리의 라이선스는 배포 파일의 `system/LICENSE`에 있습니다.

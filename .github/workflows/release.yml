@@ -83,3 +83,22 @@ jobs:
           path: dist/자리배치.zip
           compression-level: 0
           retention-days: 14
+
+  # 태그(v*)일 때만 GitHub Releases에 zip을 그대로 올린다 (아티팩트는 zip이 한 번 더 묶이고 로그인이 필요함).
+  # 쓰기 권한은 이 작업에만 준다.
+  publish:
+    needs: windows
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: 자리배치-windows
+      # 릴리스 첨부 파일 이름에 한글을 쓰면 GitHub이 바꿔 버리므로 영문 이름으로 올린다 (안의 폴더는 그대로 "자리배치").
+      - run: mv 자리배치.zip jaribaechi-windows.zip
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: jaribaechi-windows.zip
+          generate_release_notes: true
