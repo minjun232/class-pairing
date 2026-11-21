@@ -10,7 +10,7 @@
 압축을 풀고 `자리배치` 폴더 안의 `자리배치.exe`를 실행하세요. 설치는 필요 없습니다. 이전 버전은 [Releases](https://github.com/minjun232/class-pairing/releases)에 있습니다.
 
 ## 문서
-- [사용설명서 (원본 HTML)](docs/manual/사용설명서.html)
+- [사용설명서 (PDF)](https://github.com/minjun232/class-pairing/releases/latest/download/jaribaechi-manual.pdf)
 
 ## 구조
 | 경로 | 내용 |

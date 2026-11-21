@@ -81,7 +81,11 @@ nav {
   border-bottom: 1px solid var(--line);
 }
 nav .nav-class { font-weight: 800; font-size: 1.1em; }
-nav .tabs { display: flex; gap: .3em; margin: 0 auto; }
+nav .tabs { display: flex; gap: .3em; margin: 0 0 0 1em; }
+nav .nav-start, nav .steps { margin-left: auto; margin-right: auto; }
+.steps { display: flex; gap: .4em; list-style: none; padding: 0; margin: 0; font-size: .9em; color: var(--ink-soft); }
+.steps li + li::before { content: '→'; margin-right: .4em; }
+.steps li.on { color: var(--accent); font-weight: 800; }
 nav .tabs button { font-weight: 600; color: var(--ink-soft); }
 nav .tabs button.active { background: var(--accent-soft); color: var(--accent); }
 .model-status { font-size: .75em; color: var(--ink-soft); white-space: nowrap; }

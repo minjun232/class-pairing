@@ -36,7 +36,55 @@ function show(screen) {
   for (const s of ['class', 'roster', 'room', 'req', 'seat']) $('#screen-' + s).hidden = s !== screen;
   $('#nav').hidden = screen === 'class';
   $$('#nav .tabs button').forEach((b) => b.classList.toggle('active', b.dataset.go === screen));
+  // 준비(명단·교실)에서는 [자리 배치 시작], 진행(요청·배치)에서는 단계 표시
+  const progress = screen === 'req' || screen === 'seat';
+  $('#btn-start').hidden = progress;
+  $('#steps').hidden = !progress;
+  renderSteps();
+  syncStart();
   requestAnimationFrame(fitAll);
+}
+
+// 진행 단계: 요청 → 배치 → 공개 → 확정
+function renderSteps() {
+  const step = S.screen === 'req' ? 0 : !S.arranged ? 1 : S.confirmed ? 3 : 2;
+  $$('#steps li').forEach((li, i) => li.classList.toggle('on', i === step));
+}
+
+// 준비가 끝났는지 (명단 있음, 자리가 충분함). 부족하면 이유, 끝났으면 null
+function notReady() {
+  const v = S.view;
+  if (!v) return '반을 먼저 골라 주세요';
+  if (v.roster_error) return v.roster_error;
+  if (!v.students.length) return '명단을 먼저 적어 주세요';
+  const lack = v.students.length - S.layout.seats.length;
+  if (lack > 0) return `자리가 ${lack}개 부족해요`;
+  return null;
+}
+
+function syncStart() {
+  const why = notReady();
+  $('#btn-start').disabled = !!why;
+  $('#btn-start').title = why || '';
+  $('#btn-start').textContent = inProgress() ? '배치로 돌아가기' : '자리 배치 시작';
+}
+
+// 확정하지 않은 배치가 있으면 준비 화면에 다녀와도 그 배치로 돌아간다
+const inProgress = () => !!S.arranged && !S.confirmed;
+
+async function startArranging() {
+  if (S.screen === 'roster' && S.rosterDirty && !(await saveRoster())) return;
+  if (inProgress()) {
+    show('seat');
+    renderSeat();
+    return;
+  }
+  await refreshView();
+  const why = notReady();
+  if (why) { toast(why); syncStart(); return; }
+  resetSeat();
+  S.prev = null;
+  await go('req');
 }
 
 let toastTimer = null;
@@ -78,7 +126,14 @@ async function pollStatus() {
     $('#model-status').textContent = text;
     $('#model-status-2').textContent = text;
     S.status = st;
+    syncArrangeButtons();
   } catch (_) { /* 무시 */ }
+}
+
+// 조건·요청을 읽는 중이거나 배치하는 중에는 배치 버튼을 누를 수 없다
+function syncArrangeButtons() {
+  const off = S.arranging || (S.status?.pending ?? 0) > 0;
+  ['#btn-arrange', '#btn-rearrange', '#btn-req-next'].forEach((b) => ($(b).disabled = off));
 }
 
 // ---------------------------------------------------------------- ① 반 선택
@@ -145,6 +200,7 @@ function applyView(v) {
   S.view = v;
   S.classroom = v.classroom;
   S.layout = v.layout;
+  syncStart();
 }
 
 async function refreshView() {
@@ -180,6 +236,7 @@ async function saveRoom() {
   try {
     S.layout = await invoke('set_classroom', { classroom: S.classroom });
   } catch (e) { $('#room-msg').textContent = e; }
+  syncStart();
   renderRoom();
 }
 
@@ -387,6 +444,7 @@ function renderSeat() {
   });
   renderNames();
   renderSeatButtons();
+  renderSteps();
   fitAll();
 }
 
@@ -446,9 +504,15 @@ function onSeatClick(i) {
 }
 
 async function arrange() {
+  // "현재 배치 보기"에서 [새로 배치]를 누르면 요청부터 다시 시작한다
+  if (!S.arranged && S.prev) return startArranging();
   if (S.reqDirty) await saveRequests();
-  const btns = ['#btn-arrange', '#btn-rearrange'];
-  btns.forEach((b) => ($(b).disabled = true));
+  if (S.screen !== 'seat') {
+    show('seat');
+    renderSeat();
+  }
+  S.arranging = true;
+  syncArrangeButtons();
   $('#seat-msg').className = 'msg';
   try {
     for (;;) {
@@ -471,7 +535,8 @@ async function arrange() {
     $('#seat-msg').className = 'msg error';
     $('#seat-msg').textContent = e;
   } finally {
-    btns.forEach((b) => ($(b).disabled = false));
+    S.arranging = false;
+    syncArrangeButtons();
   }
 }
 
@@ -585,6 +650,8 @@ function setup() {
   $('#new-class').onkeydown = (e) => { if (e.key === 'Enter') addClass(); };
   $('#btn-open-class').onclick = openSelected;
   $('#btn-save-req').onclick = saveRequests;
+  $('#btn-req-next').onclick = arrange;
+  $('#btn-start').onclick = startArranging;
   $('#btn-arrange').onclick = arrange;
   $('#btn-rearrange').onclick = arrange;
   $('#btn-reveal-all').onclick = () => {

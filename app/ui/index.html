@@ -10,12 +10,15 @@
   <!-- 상단 탭 (반 선택 화면에서는 숨김) -->
   <nav id="nav" hidden>
     <button class="nav-class" data-go="class" id="nav-classname">반</button>
+    <!-- 준비: 명단·교실 / 진행: [자리 배치 시작] → 요청 → 배치 → 공개 → 확정 -->
     <div class="tabs">
       <button data-go="roster">명단</button>
       <button data-go="room">교실</button>
-      <button data-go="req">요청</button>
-      <button data-go="seat">자리 배치</button>
     </div>
+    <button id="btn-start" class="primary nav-start">자리 배치 시작</button>
+    <ol id="steps" class="steps" hidden>
+      <li>요청</li><li>배치</li><li>공개</li><li>확정</li>
+    </ol>
     <span id="model-status" class="model-status"></span>
     <button class="quit" data-action="quit" aria-label="끝내기">끝내기</button>
   </nav>
@@ -110,11 +113,13 @@
 
   <!-- ③ 학생 요청 -->
   <section id="screen-req" class="screen" hidden>
+    <p class="hint">학생 요청이 있으면 이름 옆에 적어 주세요. 없으면 바로 [자리 배치]를 누르세요.</p>
     <p id="req-msg" class="msg warn"></p>
     <div id="req-list" class="req-list"></div>
     <div class="bottom-bar">
       <span id="req-saved" class="saved"></span>
-      <button id="btn-save-req" class="primary">저장</button>
+      <button id="btn-save-req" class="secondary">저장</button>
+      <button id="btn-req-next" class="primary big">자리 배치</button>
     </div>
   </section>
 
