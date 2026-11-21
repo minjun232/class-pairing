@@ -15,7 +15,7 @@ use names::{canonicalize, NameMatcher};
 use seat_core::Rule;
 
 /// 해석 방식이 바뀌면 올린다 → 저장된 해석 캐시가 자동으로 버려진다.
-pub const INTERPRETER_VERSION: &str = "2";
+pub const INTERPRETER_VERSION: &str = "3";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ChatMessage {

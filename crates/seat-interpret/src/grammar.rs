@@ -31,7 +31,7 @@ pub fn allowed(names: &[String], cues: &Cues) -> Allowed {
 pub fn build(names: &[String], cues: &Cues) -> String {
     let a = allowed(names, cues);
     let name = alt(names.iter().map(|n| lit(n)));
-    let zone = alt(ZONE_WORDS.iter().map(|z| lit(z)));
+    let zone = alt(ZONE_WORDS.iter().filter(|z| cues.zone_ok(z)).map(|z| lit(z)));
     // 부정어가 있으면 "멀리/짝아님"만, 없으면 "짝/근처/멀리"만
     let rels: &[&str] = if cues.negation { &["멀리", "짝아님"] } else { &["짝", "근처", "멀리"] };
     let rel = alt(rels.iter().map(|r| lit(r)));
@@ -100,5 +100,7 @@ mod tests {
         let g = build(&one, &Cues::find(" 3줄 5열 말고"));
         assert!(g.contains("where ::= simple | not | all"));
         assert!(g.contains("simple ::= zone | range"));
+        let g = build(&one, &Cues::find("은 맨뒷줄"));
+        assert!(!g.contains("뒷문근처") && g.contains("맨뒤"));
     }
 }

@@ -13,7 +13,7 @@ const NEGATION: &[&str] = &[
 /// 자리(장소)를 말하는 낱말. 같은 무리는 한 번만 센다.
 const PLACE: &[&[&str]] = &[
     &["앞"],
-    &["뒤"],
+    &["뒤", "뒷"],
     &["창가", "창문", "창 쪽", "창쪽"],
     &["복도"],
     &["가운데", "중앙"],
@@ -23,6 +23,20 @@ const PLACE: &[&[&str]] = &[
     &["줄", "열", "번째"],
     &["시력", "눈이", "눈 ", "키가", "키 ", "청력", "귀가", "안 보", "잘 보"],
     &["맨", "구석", "끝"],
+];
+
+/// 특정 위치를 가리키는 장소 낱말은 문장에 그 단서가 있을 때만 쓸 수 있다.
+/// ("맨뒷줄"이 `뒷문근처`로, 아무 말 없는데 `복도`로 좁혀지는 일을 막는다.)
+/// 앞쪽·뒤쪽·맨앞·맨뒤는 "시력", "키" 같은 말에서 추론하므로 제한하지 않는다.
+const DOOR: &[&str] = &["출입문", "문 근처", "문근처", "문 옆", "문옆", "문쪽", "문 쪽"];
+pub const ZONE_CUES: &[(&str, &[&str])] = &[
+    ("창가", &["창가", "창문", "창 쪽", "창쪽"]),
+    ("복도", &["복도"]),
+    ("가운데", &["가운데", "중앙"]),
+    ("교탁근처", &["교탁", "선생님", "집중", "떠들", "떠듦", "딴짓", "감시"]),
+    ("칠판근처", &["칠판"]),
+    ("앞문근처", &["앞문"]),
+    ("뒷문근처", &["뒷문"]),
 ];
 
 /// "이거나 저거" 같은 선택 표현
@@ -35,6 +49,8 @@ pub struct Cues {
     /// 장소 낱말 무리 수
     pub place_groups: usize,
     pub choice: bool,
+    /// `ZONE_CUES` 순서대로, 문장에 단서가 있는지
+    pub zone_cues: [bool; 7],
 }
 
 impl Cues {
@@ -45,7 +61,16 @@ impl Cues {
             negation: NEGATION.iter().any(|n| text.contains(n)),
             place_groups: PLACE.iter().filter(|g| g.iter().any(|w| text.contains(w))).count(),
             choice: CHOICE.iter().any(|w| text.contains(w)),
+            zone_cues: std::array::from_fn(|i| {
+                let (zone, words) = ZONE_CUES[i];
+                words.iter().any(|w| text.contains(w)) || (zone.ends_with("문근처") && DOOR.iter().any(|w| text.contains(w)))
+            }),
         }
+    }
+
+    /// 이 장소 낱말을 출력에 쓸 수 있는지
+    pub fn zone_ok(&self, zone: &str) -> bool {
+        ZONE_CUES.iter().position(|(z, _)| *z == zone).map_or(true, |i| self.zone_cues[i])
     }
 
     pub fn place(&self) -> bool {
@@ -115,6 +140,20 @@ mod tests {
         assert!(Cues::find(" 1줄 2열").digits);
         assert!(!Cues::find(" 오늘 결석").place());
         assert!(Cues::find(" 창가나 맨 뒤").choice);
+        assert!(Cues::find(" 뒷자리").place());
+    }
+
+    #[test]
+    fn specific_zones_need_their_cue() {
+        let c = Cues::find("은 맨뒷줄");
+        assert!(!c.zone_ok("뒷문근처") && !c.zone_ok("복도") && !c.zone_ok("창가"));
+        assert!(c.zone_ok("맨뒤") && c.zone_ok("뒤쪽"));
+        assert!(Cues::find(" 교탁 근처").zone_ok("교탁근처"));
+        assert!(Cues::find(" 선생님 눈에 잘 띄는 자리").zone_ok("교탁근처"));
+        let door = Cues::find(" 문 근처는 싫어요");
+        assert!(door.zone_ok("앞문근처") && door.zone_ok("뒷문근처"));
+        let front = Cues::find(" 앞문 옆");
+        assert!(front.zone_ok("앞문근처") && !front.zone_ok("뒷문근처"));
     }
 
     #[test]
