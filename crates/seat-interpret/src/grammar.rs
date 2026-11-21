@@ -51,7 +51,7 @@ pub fn build(names: &[String], cues: &Cues) -> String {
     if cues.negation {
         where_alts.push("not");
     }
-    if cues.place_groups + usize::from(cues.digits) >= 2 {
+    if cues.compound() {
         where_alts.push(if cues.choice { "any" } else { "all" });
     }
     let where_ = where_alts.join(" | ");
@@ -102,5 +102,6 @@ mod tests {
         assert!(g.contains("simple ::= zone | range"));
         let g = build(&one, &Cues::find("은 맨뒷줄"));
         assert!(!g.contains("뒷문근처") && g.contains("맨뒤"));
+        assert!(g.contains("where ::= simple\n"), "맨뒷줄은 장소 하나 → all 없음");
     }
 }

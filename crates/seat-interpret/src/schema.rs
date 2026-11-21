@@ -59,6 +59,13 @@ fn pair(v: &Value) -> Option<(u32, u32)> {
     (x >= 1 && y >= 1 && x <= 99 && y <= 99).then_some((x, y))
 }
 
+/// `all` 안에 서로 반대인 구역(앞쪽·맨앞 ↔ 뒤쪽·맨뒤, 창가 ↔ 복도)이 함께 있는지
+fn contradicts(items: &[Place]) -> bool {
+    let has = |zs: &[Zone]| items.iter().any(|p| matches!(p, Place::Zone(z) if zs.contains(z)));
+    (has(&[Zone::Front, Zone::FrontMost]) && has(&[Zone::Back, Zone::BackMost]))
+        || (has(&[Zone::Window]) && has(&[Zone::Hallway]))
+}
+
 fn place(v: &Value, depth: u32) -> Option<Place> {
     if depth > 6 {
         return None;
@@ -95,6 +102,9 @@ fn place(v: &Value, depth: u32) -> Option<Place> {
                 items.into_iter().next().unwrap()
             } else if k == "any" {
                 Place::Any(items)
+            } else if contradicts(&items) {
+                // "앞이면서 뒤" 같은 조합은 모델의 오해다 → 잘못된 출력으로 보고 다시 생성
+                return None;
             } else {
                 Place::All(items)
             }
@@ -167,5 +177,15 @@ mod tests {
         assert!(parse_output(r#"{"rules":[{"type":"place","who":"김철수","where":"하늘"}]}"#, &names).is_err());
         assert!(parse_output("garbage", &names).is_err());
         assert_eq!(parse_output(r#"{"rules":[]}"#, &names).unwrap(), vec![]);
+    }
+
+    #[test]
+    fn contradictory_all_rejected() {
+        let names = vec!["김철수".to_string()];
+        let out = |w: &str| format!(r#"{{"rules":[{{"type":"place","who":"김철수","where":{w}}}]}}"#);
+        assert!(parse_output(&out(r#"{"all":["맨뒤","맨앞"]}"#), &names).is_err());
+        assert!(parse_output(&out(r#"{"all":["창가","복도"]}"#), &names).is_err());
+        assert!(parse_output(&out(r#"{"all":["창가","맨뒤"]}"#), &names).is_ok());
+        assert!(parse_output(&out(r#"{"any":["맨앞","맨뒤"]}"#), &names).is_ok());
     }
 }

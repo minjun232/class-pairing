@@ -20,10 +20,12 @@ const PLACE: &[&[&str]] = &[
     &["교탁", "선생님", "집중", "떠들", "떠듦", "딴짓", "감시"],
     &["칠판"],
     &["앞문", "뒷문", "출입문", "문 근처", "문 옆", "문쪽", "문 쪽"],
-    &["줄", "열", "번째"],
     &["시력", "눈이", "눈 ", "키가", "키 ", "청력", "귀가", "안 보", "잘 보"],
-    &["맨", "구석", "끝"],
 ];
+
+/// 장소를 꾸미기만 하는 말. 장소 단서로는 보지만, 장소 여러 개를 묶는(`all`/`any`) 근거로는 세지 않는다.
+/// ("맨 뒷줄"을 장소 3개로 세면 `맨뒤`+`맨앞` 같은 엉뚱한 조합이 허용된다)
+const MODIFIER: &[&[&str]] = &[&["줄", "열", "번째"], &["맨", "구석", "끝"]];
 
 /// 특정 위치를 가리키는 장소 낱말은 문장에 그 단서가 있을 때만 쓸 수 있다.
 /// ("맨뒷줄"이 `뒷문근처`로, 아무 말 없는데 `복도`로 좁혀지는 일을 막는다.)
@@ -46,8 +48,12 @@ const CHOICE: &[&str] = &["이나 ", "나 ", "거나", "또는", "혹은", "아�
 pub struct Cues {
     pub digits: bool,
     pub negation: bool,
-    /// 장소 낱말 무리 수
+    /// 장소 낱말 무리 수 (꾸밈말 포함)
     pub place_groups: usize,
+    /// 실제 장소를 말하는 무리 수 (꾸밈말 제외)
+    pub locations: usize,
+    /// 숫자 덩어리 수 ("3줄 5열" → 2)
+    pub numbers: usize,
     pub choice: bool,
     /// `ZONE_CUES` 순서대로, 문장에 단서가 있는지
     pub zone_cues: [bool; 7],
@@ -56,10 +62,14 @@ pub struct Cues {
 impl Cues {
     /// `text`는 학생 이름을 지운 문장이어야 한다("문채린"의 "문" 같은 오인 방지).
     pub fn find(text: &str) -> Self {
+        let count = |groups: &[&[&str]]| groups.iter().filter(|g| g.iter().any(|w| text.contains(w))).count();
+        let locations = count(PLACE);
         Cues {
             digits: text.chars().any(|c| c.is_ascii_digit()),
             negation: NEGATION.iter().any(|n| text.contains(n)),
-            place_groups: PLACE.iter().filter(|g| g.iter().any(|w| text.contains(w))).count(),
+            place_groups: locations + count(MODIFIER),
+            locations,
+            numbers: text.split(|c: char| !c.is_ascii_digit()).filter(|s| !s.is_empty()).count(),
             choice: CHOICE.iter().any(|w| text.contains(w)),
             zone_cues: std::array::from_fn(|i| {
                 let (zone, words) = ZONE_CUES[i];
@@ -79,6 +89,11 @@ impl Cues {
 
     pub fn place(&self) -> bool {
         self.place_groups > 0 || self.digits
+    }
+
+    /// 장소 여러 개를 묶는 식(`all`/`any`)을 쓸 수 있는지
+    pub fn compound(&self) -> bool {
+        self.locations + self.numbers >= 2
     }
 }
 
@@ -145,6 +160,17 @@ mod tests {
         assert!(!Cues::find(" 오늘 결석").place());
         assert!(Cues::find(" 창가나 맨 뒤").choice);
         assert!(Cues::find(" 뒷자리").place());
+    }
+
+    #[test]
+    fn modifiers_do_not_make_compound() {
+        // "맨 뒷줄"은 장소 하나: 맨뒤+맨앞 같은 조합을 허용하면 안 된다
+        assert!(Cues::find(" 맨 뒷줄").place());
+        assert!(!Cues::find(" 맨 뒷줄").compound());
+        assert!(!Cues::find("은 맨뒷줄").compound());
+        assert!(Cues::find(" 창가 맨 뒤").compound());
+        assert!(Cues::find(" 3줄 5열 말고").compound());
+        assert!(!Cues::find(" 3줄").compound());
     }
 
     #[test]
