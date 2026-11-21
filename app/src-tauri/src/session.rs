@@ -484,15 +484,25 @@ impl Core {
                 s.teacher.zones,
             )
         };
-        let problem = Problem {
+        let mut problem = Problem {
             layout: Some(&layout),
             students: &students,
             teacher_rules: &teacher_rules,
             student_rules: &student_rules,
             previous_pairs: &prev,
             zones,
+            relax_teacher: false,
         };
-        let arr = solve(&problem, &mut StdRng::from_entropy()).map_err(|e| match e {
+        let mut rng = StdRng::from_entropy();
+        // 교사 조건을 모두 지킬 수 없으면 거부하지 않고, 지킬 수 없는 조건을 무시해 배치한다 (사용자 결정)
+        let result = match solve(&problem, &mut rng) {
+            Err(SolveError::Infeasible) => {
+                problem.relax_teacher = true;
+                solve(&problem, &mut rng)
+            }
+            r => r,
+        };
+        let arr = result.map_err(|e| match e {
             SolveError::NotEnoughSeats(n) => format!("자리가 {n}개 부족해요"),
             SolveError::Infeasible => ERR_IMPOSSIBLE.into(),
         })?;

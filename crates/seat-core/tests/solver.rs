@@ -32,6 +32,7 @@ fn solve_with(
         student_rules: req,
         previous_pairs: prev,
         zones: ZoneSettings::default(),
+        relax_teacher: false,
     };
     solve(&p, &mut StdRng::seed_from_u64(seed))
 }
@@ -210,6 +211,32 @@ fn infeasible_and_not_enough() {
     assert_eq!(solve_with(&layout, &st, &teacher, &[], &[], 1), Err(SolveError::Infeasible));
     let st = students(3, 3);
     assert_eq!(solve_with(&layout, &st, &[], &[], &[], 1), Err(SolveError::NotEnoughSeats(2)));
+}
+
+#[test]
+fn relaxed_teacher_rules_still_arrange() {
+    // 지킬 수 없는 조건은 무시하고, 지킬 수 있는 조건은 지킨다
+    let layout = pair_layout(2, 2, GenderMode::Any);
+    let st = students(2, 2);
+    let teacher = vec![
+        Rule::Allowed { student: "남0".into(), place: Place::Seat(9, 9) },
+        Rule::Allowed { student: "남1".into(), place: Place::Seat(1, 1) },
+        Rule::Allowed { student: "여0".into(), place: Place::Seat(1, 1) },
+    ];
+    let p = Problem {
+        layout: Some(&layout),
+        students: &st,
+        teacher_rules: &teacher,
+        student_rules: &[],
+        previous_pairs: &[],
+        zones: ZoneSettings::default(),
+        relax_teacher: true,
+    };
+    let arr = solve(&p, &mut StdRng::seed_from_u64(1)).unwrap();
+    assert!(all_distinct(&arr));
+    let at = |i: usize| (layout.seats[arr.seat_of[i]].row, layout.seats[arr.seat_of[i]].col);
+    // 남1과 여0 중 한 명은 1줄 1열 (둘 다는 불가능)
+    assert!(at(1) == (1, 1) || at(2) == (1, 1));
 }
 
 #[test]

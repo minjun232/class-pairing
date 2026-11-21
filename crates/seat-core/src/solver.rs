@@ -50,6 +50,9 @@ pub struct Problem<'a> {
     /// 직전 확정 좌석표의 짝 (이름 쌍)
     pub previous_pairs: &'a [(String, String)],
     pub zones: ZoneSettings,
+    /// true면 교사 조건을 모두 지킬 수 없을 때 거부하지 않고, 지킬 수 있는 만큼 지킨 배치를 낸다.
+    /// (사용자 결정 2026-11-22: 배치가 막히는 것보다 지킬 수 없는 조건을 무시하는 편이 낫다)
+    pub relax_teacher: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -234,6 +237,10 @@ pub fn solve<R: Rng + ?Sized>(p: &Problem, rng: &mut R) -> Result<Arrangement, S
         if let Some(c) = compile_rule(r, layout, &p.zones, &index) {
             if let Constraint::Allowed { gap, .. } = &c {
                 if !gap.iter().any(|&g| g == 0) {
+                    // 앉을 수 있는 자리가 하나도 없는 조건
+                    if p.relax_teacher {
+                        continue;
+                    }
                     return Err(SolveError::Infeasible);
                 }
             }
@@ -297,7 +304,7 @@ pub fn solve<R: Rng + ?Sized>(p: &Problem, rng: &mut R) -> Result<Arrangement, S
         }
     }
     let (cost, mut pos) = best.unwrap();
-    if cost[0] > 0 {
+    if cost[0] > 0 && !p.relax_teacher {
         return Err(SolveError::Infeasible);
     }
     // 최적 배치들 사이의 무작위 걷기
