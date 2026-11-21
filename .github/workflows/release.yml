@@ -1,0 +1,85 @@
+name: 배포 파일 만들기 (Windows)
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+    # 개발 브랜치에서도 배포 파일이 만들어지는지 확인 (확정 후 지워도 됨)
+    branches: ["claude/**"]
+
+# 공개 저장소: 워크플로는 코드 읽기 권한만 가진다
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  # 모델: 재배포 가능한 라이선스(Apache 2.0)
+  MODEL_REPO: Qwen/Qwen2.5-1.5B-Instruct-GGUF
+  MODEL_FILE: qwen2.5-1.5b-instruct-q4_k_m.gguf
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    env:
+      # VC++ 재배포 패키지가 없는 PC에서도 실행되도록 C 런타임을 정적으로 넣는다.
+      RUSTFLAGS: "-C target-feature=+crt-static"
+      LLAMA_STATIC_CRT: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: 빌드
+        run: cargo build --release -p jaribaechi
+      - name: 템플릿 만들기
+        run: cargo run --release -p seat-storage --example template -- template.xlsx
+      - name: 모델 캐시
+        uses: actions/cache@v4
+        with:
+          path: models
+          key: model-${{ env.MODEL_FILE }}
+      - name: 모델 내려받기
+        shell: bash
+        run: |
+          mkdir -p models
+          if [ ! -f "models/$MODEL_FILE" ]; then
+            curl -fL --retry 3 -o "models/$MODEL_FILE" "https://huggingface.co/$MODEL_REPO/resolve/main/$MODEL_FILE"
+          fi
+      - name: 사용설명서 PDF
+        shell: pwsh
+        run: |
+          # 한글 경로를 피하려고 영문 이름으로 복사한 뒤, Chrome이 끝날 때까지 기다린다.
+          Copy-Item docs/manual/사용설명서.html "$env:RUNNER_TEMP\manual.html"
+          $chrome = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+          $url = "file:///" + ("$env:RUNNER_TEMP\manual.html" -replace '\\','/')
+          $out = "$PWD\manual.pdf"
+          $p = Start-Process -FilePath $chrome -PassThru -Wait -ArgumentList @(
+            "--headless=new", "--disable-gpu", "--no-sandbox", "--no-pdf-header-footer",
+            "--user-data-dir=$env:RUNNER_TEMP\chrome-profile", "--print-to-pdf=$out", $url)
+          for ($i = 0; $i -lt 30 -and !(Test-Path $out); $i++) { Start-Sleep -Seconds 1 }
+          if (!(Test-Path $out)) { throw "PDF 생성 실패 (exit $($p.ExitCode))" }
+          Get-Item $out
+      - name: 묶기
+        shell: pwsh
+        run: |
+          $root = "dist\자리배치"
+          New-Item -ItemType Directory -Force "$root\반", "$root\system\state" | Out-Null
+          Copy-Item target\release\jaribaechi.exe "$root\자리배치.exe"
+          Copy-Item manual.pdf "$root\사용설명서.pdf"
+          Copy-Item template.xlsx "$root\system\template.xlsx"
+          Copy-Item "models\$env:MODEL_FILE" "$root\system\model.gguf"
+          $lic = "$root\system\LICENSE"
+          Copy-Item packaging\NOTICE.txt $lic
+          Add-Content $lic "`n`n===== MIT License (자리배치) =====`n"
+          Add-Content $lic (Get-Content LICENSE -Raw)
+          Add-Content $lic "`n`n===== Apache License 2.0 (Qwen2.5) =====`n"
+          Add-Content $lic (Invoke-WebRequest -UseBasicParsing "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct/raw/main/LICENSE").Content
+          Add-Content $lic "`n`n===== MIT License (llama.cpp) =====`n"
+          Add-Content $lic (Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/ggml-org/llama.cpp/master/LICENSE").Content
+          Compress-Archive -Path $root -DestinationPath dist\자리배치.zip -CompressionLevel Optimal
+          Get-ChildItem -Recurse dist | Select-Object FullName, Length
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 자리배치-windows
+          path: dist/자리배치.zip
+          compression-level: 0
+          retention-days: 14

@@ -1,0 +1,33 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/seat-core",
+    "crates/seat-interpret", "crates/seat-llm",
+    "crates/seat-storage",
+    "crates/seat-llm",
+    "app/src-tauri",
+]
+
+[workspace.package]
+edition = "2021"
+version = "0.1.0"
+authors = ["aa_sae__"]
+license = "MIT"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rand = "0.8"
+thiserror = "1"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 4
+strip = true
+
+[profile.test]
+opt-level = 2
+
+[profile.dev.package.seat-core]
+opt-level = 2

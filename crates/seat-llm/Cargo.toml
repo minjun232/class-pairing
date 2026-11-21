@@ -1,0 +1,15 @@
+[package]
+name = "seat-llm"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "llama.cpp로 내장 모델(GGUF)을 CPU에서 실행"
+
+[dependencies]
+seat-interpret = { path = "../seat-interpret" }
+llama-cpp-2 = { version = "0.1.161", default-features = false }
+
+[dev-dependencies]
+seat-core = { path = "../seat-core" }
+serde_json.workspace = true

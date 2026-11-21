@@ -1,0 +1,21 @@
+자리배치 — 함께 들어 있는 모델과 라이브러리
+
+Copyright (c) 2026 aa_sae__
+자리배치 프로그램은 MIT License로 배포됩니다 (아래 전문).
+
+이 폴더(system)에는 다음 구성 요소가 들어 있습니다. 각 구성 요소의 저작권과
+라이선스는 원저작자에게 있으며, 아래 라이선스 전문을 함께 배포합니다.
+
+1. 내장 모델 (system/model.gguf)
+   - Qwen2.5-1.5B-Instruct (GGUF 양자화본), Alibaba Cloud Qwen Team
+   - 라이선스: Apache License 2.0 (아래 전문)
+   - 출처: https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF
+
+2. llama.cpp / ggml — MIT License (아래 전문)
+   - 출처: https://github.com/ggml-org/llama.cpp
+
+3. Tauri — MIT 또는 Apache License 2.0
+   - 출처: https://github.com/tauri-apps/tauri
+
+4. 그 밖의 Rust 라이브러리 (calamine, rust_xlsxwriter, docx-rs, encoding_rs, serde 등)
+   — 각 라이브러리의 MIT 또는 Apache License 2.0

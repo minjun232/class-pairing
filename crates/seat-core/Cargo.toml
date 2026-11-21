@@ -1,0 +1,15 @@
+[package]
+name = "seat-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "교실 모양, 규칙, 배치 알고리즘 (파일·OS 접근 없음)"
+
+[dependencies]
+serde.workspace = true
+rand.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true

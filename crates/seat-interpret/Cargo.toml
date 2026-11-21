@@ -1,0 +1,12 @@
+[package]
+name = "seat-interpret"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "자연어 조건 → 규칙 JSON (프롬프트, 문법 제약, 이름 인식, 검증)"
+
+[dependencies]
+seat-core = { path = "../seat-core" }
+serde.workspace = true
+serde_json.workspace = true

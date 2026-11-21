@@ -1,0 +1,60 @@
+# ---- 빌드 결과 ----
+/target
+/dist
+/app/src-tauri/gen
+*.pdb
+
+# ---- 모델 (배포 시 CI가 내려받음, 1GB 이상) ----
+*.gguf
+/models
+
+# ---- 비밀값·개인 설정 ----
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+*.p12
+.claude/settings.local.json
+
+# ---- AI 작업 안내 (개인용) ----
+CLAUDE.md
+CLAUDE.local.md
+
+# ---- 실행하면 생기는 데이터 (학생 명단·교사 조건이 들어 있음) ----
+/반
+/system
+/app/src-tauri/반
+/app/src-tauri/system
+*.docx
+명단.xlsx
+Settings.ini
+*.dat
+*.tmp
+
+# ---- 평가·테스트 결과 ----
+eval.txt
+/crates/seat-interpret/eval/*.txt
+
+# ---- 편집기·운영체제 ----
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Python (평가 문장 생성 스크립트) ----
+__pycache__/
+*.pyc
+
+# ---- 공개하지 않는 문서 (설계, 내부 메모, 블로그 초안) ----
+/docs/*.md
+
+# ---- 개발 도구 (배포·빌드에 필요 없음, 로컬에만 보관) ----
+# 브라우저용 화면 미리보기(가짜 백엔드)
+/app/dev/
+# 해석 정확도 평가 문장·도구
+/crates/seat-interpret/eval/
+/crates/seat-llm/examples/

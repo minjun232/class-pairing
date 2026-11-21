@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>자리배치 사용설명서</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "Malgun Gothic", "맑은 고딕", "Noto Sans KR", sans-serif; color: #1d2433; line-height: 1.75; font-size: 11.5pt; max-width: 760px; margin: 0 auto; padding: 24px; }
+  h1 { font-size: 26pt; margin: 0 0 4px; }
+  h2 { font-size: 16pt; margin: 34px 0 10px; padding-bottom: 6px; border-bottom: 2px solid #2563eb; break-after: avoid; }
+  h3 { font-size: 12.5pt; margin: 22px 0 6px; break-after: avoid; }
+  .sub { color: #5b6578; margin: 0 0 24px; }
+  ol, ul { padding-left: 1.4em; }
+  li { margin: 4px 0; }
+  .box { border: 1px solid #d6dce6; border-radius: 8px; padding: 12px 16px; margin: 12px 0; background: #f8fafc; break-inside: avoid; }
+  .tip { border-left: 5px solid #2563eb; background: #eef4ff; padding: 10px 14px; border-radius: 4px; margin: 12px 0; break-inside: avoid; }
+  .warn { border-left: 5px solid #d97706; background: #fff7ed; padding: 10px 14px; border-radius: 4px; margin: 12px 0; break-inside: avoid; }
+  .btn { display: inline-block; border: 1.5px solid #94a3b8; border-radius: 6px; padding: 0 8px; font-weight: 700; background: #fff; white-space: nowrap; }
+  .file { font-weight: 700; color: #1e40af; white-space: nowrap; }
+  code, pre { font-family: Consolas, "D2Coding", monospace; }
+  pre { background: #0f172a; color: #e2e8f0; padding: 12px 16px; border-radius: 8px; line-height: 1.6; white-space: pre-wrap; break-inside: avoid; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; break-inside: avoid; }
+  th, td { border: 1px solid #d6dce6; padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: #f1f5f9; }
+  .toc { columns: 2; }
+  .page-break { break-before: page; }
+  footer { margin-top: 40px; color: #5b6578; font-size: 9.5pt; text-align: center; }
+</style>
+</head>
+<body>
+
+<h1>자리배치 사용설명서</h1>
+<p class="sub">조건을 말로 적으면, 조건을 지키는 무작위 자리를 만들어 주는 프로그램</p>
+
+<div class="box toc">
+  <ol>
+    <li>자리배치는 어떤 프로그램인가요</li>
+    <li>처음 준비하기 (압축 풀기)</li>
+    <li>프로그램 켜기</li>
+    <li>반 만들고 명단 적기</li>
+    <li>교사 조건 적기 (Settings.ini)</li>
+    <li>교실 모양 정하기</li>
+    <li>학생 요청 적기</li>
+    <li>자리 배치하고 공개하기</li>
+    <li>자리 바꾸기 (편집)</li>
+    <li>Word로 저장하기 (확정)</li>
+    <li>끝내기</li>
+    <li>이럴 땐 이렇게 하세요</li>
+  </ol>
+</div>
+
+<h2>1. 자리배치는 어떤 프로그램인가요</h2>
+<ul>
+  <li>"철수랑 영희 멀리", "민수 시력 안 좋음"처럼 <b>평소 말투로 조건을 적으면</b>, 프로그램 안에 들어 있는 작은 인공지능(AI)이 그 뜻을 읽습니다.</li>
+  <li>그다음 프로그램이 <b>조건을 모두 지키는 자리 중 하나를 무작위로</b> 고릅니다. 명단 순서와 상관없이 공평하게 고릅니다.</li>
+  <li>결과는 처음에 모두 가려져 있고, 전자칠판에서 <b>한 명씩 뒤집어 공개</b>할 수 있습니다.</li>
+  <li><b>인터넷, 설치, 회원가입이 필요 없습니다.</b> 압축을 풀고 바로 실행합니다.</li>
+  <li>선생님이 적은 조건(교사 조건)은 <b>화면 어디에도 나오지 않습니다.</b></li>
+</ul>
+
+<h2>2. 처음 준비하기 (압축 풀기)</h2>
+<ol>
+  <li>내려받은 <span class="file">자리배치.zip</span> 파일(지퍼 모양 폴더 아이콘)을 <b>USB 또는 D드라이브</b>에 복사합니다.</li>
+  <li>파일을 <b>마우스 오른쪽 버튼</b>으로 누르고 <span class="btn">압축 풀기</span> 또는 <span class="btn">모두 압축 풀기...</span>를 누릅니다.</li>
+  <li><span class="btn">압축 풀기</span> 버튼을 한 번 더 누르면 <span class="file">자리배치</span> 폴더가 생깁니다.</li>
+</ol>
+
+<div class="warn">
+  <b>바탕화면이나 C드라이브에는 두지 마세요.</b> 학교 컴퓨터는 다시 켜면 C드라이브가 처음 상태로 돌아가는 경우가 많아, 반 정보와 직전 자리표가 사라질 수 있습니다. 모든 정보는 <b>프로그램 폴더 안에</b> 저장됩니다.
+</div>
+
+<h3>폴더 안에 들어 있는 것</h3>
+<p>컴퓨터 설정에 따라 파일 이름 뒤의 확장자(<code>.exe</code>, <code>.xlsx</code> 등)가 보이지 않을 수 있습니다. 아래 표의 "확장자가 안 보일 때"를 참고하세요.</p>
+<table>
+  <tr><th>이름</th><th>확장자가 안 보일 때</th><th>설명</th></tr>
+  <tr><td class="file">자리배치.exe</td><td><b>자리배치</b> (파란 책상 그림 아이콘)</td><td>프로그램입니다. <b>선생님이 누르는 파일은 이것 하나</b>입니다.</td></tr>
+  <tr><td class="file">사용설명서.pdf</td><td><b>사용설명서</b> (PDF 아이콘)</td><td>지금 보고 있는 설명서입니다.</td></tr>
+  <tr><td class="file">반</td><td>폴더</td><td>반마다 폴더가 하나씩 생깁니다. 명단과 교사 조건을 여기서 고칩니다.</td></tr>
+  <tr><td class="file">system</td><td>폴더</td><td>프로그램이 쓰는 파일입니다. <b>열거나 고치지 마세요.</b></td></tr>
+</table>
+
+<h2>3. 프로그램 켜기</h2>
+<ol>
+  <li><span class="file">자리배치.exe</span>(확장자가 안 보이면 <b>자리배치</b>, 파란 책상 그림 아이콘)를 두 번 누릅니다.</li>
+  <li>처음 실행할 때 파란 창 <b>"Windows의 PC 보호"</b>가 나오면 <span class="btn">추가 정보</span>를 누르고 <span class="btn">실행</span>을 누릅니다.</li>
+  <li>백신(V3, 알약 등)이 경고하면 "허용" 또는 "예외로 등록"을 선택합니다.</li>
+</ol>
+<div class="tip">
+  켜자마자 왼쪽 아래 또는 오른쪽 위에 작게 <b>"모델 불러오는 중…"</b>이 보입니다. 인공지능을 준비하는 중이며, USB가 느리면 1분 정도 걸릴 수 있습니다. 기다리는 동안에도 다른 설정은 할 수 있습니다.
+</div>
+
+<h2>4. 반 만들고 명단 적기</h2>
+<ol>
+  <li>첫 화면 아래 칸에 반 이름(예: <code>2-3</code>)을 적고 <span class="btn">반 추가</span>를 누릅니다. 새 반이 바로 열리고 <span class="btn">명단</span> 화면이 나옵니다.</li>
+  <li><b>남</b> 칸에 남학생, <b>여</b> 칸에 여학생 이름을 <b>한 줄에 한 명씩</b> 적습니다. 엑셀이나 나이스에서 이름을 복사해 붙여 넣어도 됩니다.</li>
+  <li><span class="btn">저장</span>을 누릅니다. 다른 화면으로 넘어가도 자동으로 저장됩니다.</li>
+</ol>
+<div class="tip">
+  명단은 반 폴더의 <span class="file">명단.xlsx</span>(확장자가 안 보이면 <b>명단</b>, 초록색 엑셀 아이콘)에 저장됩니다. 엑셀로 직접 고쳐도 됩니다. <b>A열(남)</b>, <b>B열(여)</b>에 한 칸에 한 명씩 적고, 고친 뒤에는 엑셀을 닫아 주세요. 엑셀에서 열려 있으면 프로그램이 명단을 읽거나 저장하지 못할 수 있습니다.
+</div>
+<div class="box">
+  <b>이름이 같은 학생(동명이인)</b>은 반에서 부르는 그대로 구분해 적습니다. 예: <code>김민수 A</code> / <code>김민수 B</code>, 또는 <code>김민수1</code> / <code>김민수2</code><br>
+  조건이나 요청에도 같은 표기(<code>민수 A</code>, <code>민수1</code>)를 써 주세요. 그냥 "민수"라고만 쓰면 누구인지 알 수 없어 그 조건은 건너뜁니다.
+</div>
+<p>같은 반 폴더에는 교사 조건을 적는 <span class="file">Settings.ini</span>(확장자가 안 보이면 <b>Settings</b>, 톱니바퀴 아이콘 또는 흰 종이 아이콘)도 있습니다. 다음 장을 보세요.</p>
+
+<h2 class="page-break">5. 교사 조건 적기 (Settings.ini)</h2>
+<p>교사 조건은 <b>항상 가장 먼저 지켜지는 조건</b>입니다. 학생이 볼 수 없도록 파일 이름을 평범한 설정 파일처럼 지어 두었습니다.</p>
+
+<h3>파일 여는 방법 (셋 중 편한 방법)</h3>
+<ol>
+  <li><span class="file">Settings.ini</span>를 <b>두 번 누릅니다.</b> 메모장이 열리면 끝입니다.</li>
+  <li>열리지 않거나 "어떤 앱으로 여시겠어요?"가 나오면 <b>메모장</b>을 고르고 <span class="btn">확인</span>을 누릅니다.</li>
+  <li>그래도 안 되면 파일을 <b>마우스 오른쪽 버튼</b>으로 누르고 <span class="btn">연결 프로그램</span> → <span class="btn">메모장</span>을 고릅니다.</li>
+</ol>
+
+<h3>적는 방법</h3>
+<ul>
+  <li><b>한 줄에 조건 하나</b>씩 평소 말투로 적고 저장(Ctrl + S)합니다.</li>
+  <li>맨 위의 <code>[General]</code> 줄은 그대로 두세요(없어도 괜찮습니다).</li>
+  <li><code>;</code>로 시작하는 줄은 메모로 보고 읽지 않습니다.</li>
+</ul>
+<pre>[General]
+; 1학기 조건
+철수랑 영희 멀리
+민수 시력 안 좋음 → 앞쪽
+지훈이는 선생님 눈에 잘 띄는 자리
+서준은 1줄 3열
+하윤, 수아, 지호는 서로 떨어지게
+도윤이 뒷문 근처는 안 됨</pre>
+
+<h3>이런 말을 알아듣습니다</h3>
+<table>
+  <tr><th>적은 말</th><th>프로그램이 지키는 것</th></tr>
+  <tr><td>짝, 옆자리, 같이 앉기</td><td>같은 책상</td></tr>
+  <tr><td>근처, 가까이</td><td>짝, 앞뒤, 대각선, 통로 건너 바로 옆</td></tr>
+  <tr><td>멀리, 떨어뜨리기</td><td>근처가 아닌 자리</td></tr>
+  <tr><td>짝만 아니면 됨</td><td>같은 책상만 아니면 됨</td></tr>
+  <tr><td>앞쪽 / 뒤쪽</td><td>앞 2줄 / 뒤 2줄 (교실이 크면 앞쪽은 앞 1/3)</td></tr>
+  <tr><td>맨 앞 / 맨 뒤</td><td>첫 줄 / 마지막 줄</td></tr>
+  <tr><td>창가 / 복도 쪽 / 가운데</td><td>맨 왼쪽 열 / 맨 오른쪽 열 / 가운데 열들</td></tr>
+  <tr><td>교탁 근처, 선생님 눈에 띄는 자리</td><td>앞쪽 창문 쪽(교탁 주변)</td></tr>
+  <tr><td>앞문 근처 / 뒷문 근처 / 칠판 근처</td><td>오른쪽 앞 / 오른쪽 뒤 / 앞쪽 가운데</td></tr>
+  <tr><td>"3줄 2열", "1~2열", "2줄"</td><td>그 자리, 그 열들, 그 줄</td></tr>
+  <tr><td>"~는 싫어", "~ 말고", "~ 안 됨"</td><td>그 자리를 뺀 나머지</td></tr>
+</table>
+
+<h3>교실 방향 (꼭 읽어 주세요)</h3>
+<div class="box">
+  모든 방향은 <b>학생이 칠판을 바라본 방향</b>입니다.
+  <ul>
+    <li><b>1줄</b>이 칠판 바로 앞 줄, <b>1열</b>이 창문 쪽(왼쪽) 열입니다.</li>
+    <li>프로그램은 교실을 이렇게 알고 있습니다: <b>칠판</b> 앞쪽 가운데, <b>교탁</b> 앞쪽 창문 쪽, <b>창문</b> 왼쪽 벽, <b>앞문·뒷문</b> 오른쪽 벽.</li>
+    <li>실제 교실이 다르면(예: 창문이 오른쪽) "창가" 대신 <b>"1열", "6열"처럼 숫자로</b> 적어 주세요.</li>
+    <li>에어컨, 사물함, 정수기처럼 위 목록에 없는 곳은 위치를 모릅니다. 이때도 줄·열 숫자로 적어 주세요.</li>
+  </ul>
+</div>
+
+<h3>"앞쪽"의 기준 바꾸기 (필요할 때만)</h3>
+<p>Settings.ini에 아래처럼 숫자를 적으면 기준이 바뀝니다.</p>
+<pre>앞쪽 = 3     ← 앞쪽을 앞 3줄로
+뒤쪽 = 1     ← 뒤쪽을 맨 뒷줄만
+창가 = 2     ← 창가를 왼쪽 2열로
+복도 = 2     ← 복도 쪽을 오른쪽 2열로</pre>
+
+<div class="warn">
+  <b>알아듣지 못하는 조건</b>: 명단에 없는 정보가 필요한 조건("키 큰 애들 뒤로", "친한 애들끼리")은 처리할 수 없습니다. 이름을 직접 적어 주세요.
+  알아듣지 못한 조건은 아무 표시 없이 건너뜁니다(학생들 앞에서 조건 내용이 드러나지 않도록).
+</div>
+
+<h2>6. 교실 모양 정하기</h2>
+<p>반을 고르고 <span class="btn">시작</span>을 누르면 <span class="btn">교실</span> 화면이 나옵니다. 바꾼 내용은 반마다 자동으로 저장됩니다.</p>
+<ul>
+  <li><span class="btn">배치</span>: <span class="btn">짝</span>(책상마다 2명) / <span class="btn">단독</span>(1명씩) / <span class="btn">모둠</span>(<span class="btn">−</span> <span class="btn">+</span>로 인원 조절, 기본 4명, 최소 3명)</li>
+  <li><span class="btn">줄</span> <span class="btn">열</span>: 줄은 앞에서 뒤로, 열은 왼쪽에서 오른쪽으로 몇 개인지입니다.
+    <ul>
+      <li><b>짝</b>에서 열은 <b>학생 자리 수</b>입니다. 책상 3개가 나란히 있으면 6열입니다.</li>
+      <li><b>모둠</b>에서 줄·열은 <b>모둠의 줄·열 수</b>입니다.</li>
+    </ul>
+  </li>
+  <li><span class="btn">성별</span>: 짝은 <span class="btn">무관</span> / <span class="btn">남녀 짝</span>, 모둠은 <span class="btn">무관</span> / <span class="btn">남녀 고르게</span>. (단독에는 없습니다)</li>
+  <li><b>칸 누르기</b>: 칸을 누를 때마다 <b>자리 → 빈자리 → 통로</b>로 바뀝니다. 고장 난 책상은 빈자리, 책상이 없는 곳은 통로로 두세요.</li>
+  <li>학생보다 자리가 많으면 <b>뒤쪽 자리부터</b> 비워 둡니다. 자리가 모자라면 "자리가 N개 부족해요"가 나옵니다.</li>
+</ul>
+
+<h2>7. 학생 요청 적기</h2>
+<ol>
+  <li>위쪽 <span class="btn">요청</span>을 누르면 명단이 나옵니다.</li>
+  <li>학생 이름 오른쪽 칸에 그 학생의 요청을 적습니다. 예: <code>창가 자리</code>, <code>지훈이랑 짝</code>, <code>뒷문 근처는 싫어요</code></li>
+  <li><span class="btn">저장</span>을 누릅니다. 바뀐 요청만 다시 읽습니다.</li>
+</ol>
+<div class="tip">
+  학생 요청은 <b>교사 조건과 남녀 짝 설정보다 뒤에</b> 지켜집니다. 모든 요청을 지킬 수 없을 때는 특정 학생만 손해 보지 않도록 고르게 양보합니다.
+  학생 요청은 <b>파일로 저장되지 않으며</b>, 프로그램을 끄면 사라집니다.
+</div>
+
+<h2>8. 자리 배치하고 공개하기</h2>
+<ol>
+  <li>위쪽 <span class="btn">자리 배치</span>를 누르고, 화면 아래 <span class="btn">자리 배치</span> 버튼을 누릅니다.</li>
+  <li>모든 자리가 <b>?</b>로 가려진 채 나옵니다.</li>
+  <li>공개하는 방법은 두 가지입니다.
+    <ul>
+      <li>오른쪽 <b>이름</b>을 누르면 → 그 학생의 자리가 뒤집힙니다.</li>
+      <li><b>자리</b>를 누르면 → 그 자리에 앉은 학생이 나옵니다.</li>
+    </ul>
+  </li>
+  <li><span class="btn">전체 공개</span>를 누르면 한 번에 모두 보입니다. <span class="btn">다시 배치</span>를 누르면 새로 배치합니다.</li>
+</ol>
+<div class="box">
+  <b>지켜지는 순서</b>: ① 교사 조건 → ② 남녀 짝·남녀 고르게 → ③ 학생 요청 → ④ 직전 짝과 다시 짝 되지 않기 → ⑤ 무작위<br>
+  위에 있는 조건과 부딪히면 아래 조건은 꼭 필요한 만큼만 양보합니다.
+  교사 조건만으로도 자리를 만들 수 없으면 <b>"배치할 수 없어요. 설정을 확인해 주세요."</b>만 나옵니다(이유는 화면에 나오지 않습니다).
+</div>
+
+<h2>9. 자리 바꾸기 (편집)</h2>
+<p>모든 자리를 공개하면 <span class="btn">편집</span> 버튼이 나옵니다. 편집을 누르고 <b>두 자리를 차례로 누르면</b> 두 학생의 자리가 맞바뀝니다(빈자리와도 바꿀 수 있습니다). 다 바꾸면 <span class="btn">편집 끝</span>을 누릅니다.
+선생님이 직접 바꾼 자리는 조건 검사를 하지 않습니다.</p>
+
+<h2>10. Word로 저장하기 (확정)</h2>
+<ol>
+  <li><span class="btn">Word로 저장</span>을 누르면 "저장하면 자리가 확정되어 더 이상 수정할 수 없어요."가 나옵니다.</li>
+  <li><span class="btn">확정·저장</span>을 누르면 반 폴더(<span class="file">반 → 2-3</span>)에 <span class="file">자리배치_날짜.docx</span>가 저장됩니다. 알림의 <span class="btn">폴더 열기</span>를 누르면 바로 열 수 있습니다.</li>
+  <li>Word 표는 <b>교사 시점</b>(교탁에서 학생을 바라본 방향)으로 그려집니다. 한글(HWP)에서도 열립니다.</li>
+  <li>확정한 자리는 다음 배치 때 <b>"직전 짝"</b>으로 쓰입니다(직전 짝과 다시 짝이 되지 않도록 노력합니다).</li>
+  <li>확정한 뒤에도 <span class="btn">Word로 저장</span>을 다시 누르면 파일을 다시 저장할 수 있습니다.</li>
+</ol>
+
+<h3>지난번 자리 다시 보기</h3>
+<p>확정한 자리는 반마다 기억해 둡니다. <span class="btn">교실</span> 화면이나 <span class="btn">자리 배치</span> 화면에서 <span class="btn">현재 배치 보기</span>를 누르면 마지막으로 확정한 자리가 그대로 나옵니다. 여기서 <span class="btn">Word로 저장</span>을 누르면 그 자리표를 다시 저장하고, <span class="btn">새로 배치</span>를 누르면 새 배치를 시작합니다.</p>
+
+<h2>11. 끝내기</h2>
+<p>오른쪽 위 <span class="btn">끝내기</span>를 누릅니다. 저장되지 않는 내용(입력한 학생 요청, 확정하지 않은 자리)이 있으면 확인 창이 나옵니다.</p>
+
+<h2>12. 이럴 땐 이렇게 하세요</h2>
+<table>
+  <tr><th>상황</th><th>해결 방법</th></tr>
+  <tr><td>"모델 불러오는 중…"이 오래 계속돼요</td><td>USB가 느리면 1~2분 걸릴 수 있습니다. 프로그램 폴더를 D드라이브로 복사해 실행하면 빨라집니다.</td></tr>
+  <tr><td>"준비하는 중이에요…"가 계속돼요</td><td>조건과 요청을 읽는 중입니다. 오래된 컴퓨터에서는 문장 하나에 몇 초씩 걸립니다. 교사 조건은 한 번 읽으면 기억해 두므로 다음부터는 빠릅니다.</td></tr>
+  <tr><td>"배치할 수 없어요. 설정을 확인해 주세요."</td><td>교사 조건끼리 부딪히거나(예: 두 학생을 모두 1줄 1열에), 자리 모양 때문에 조건을 지킬 수 없습니다. Settings.ini와 교실 모양을 확인해 주세요.</td></tr>
+  <tr><td>"조건을 해석할 모델 파일이 없어요"</td><td><span class="file">system</span> 폴더의 파일이 지워졌습니다. 프로그램을 다시 내려받아 주세요.</td></tr>
+  <tr><td>"이 컴퓨터에서는 조건을 해석할 수 없어요."</td><td>아주 오래된 컴퓨터는 인공지능을 실행할 수 없습니다. 다른 컴퓨터에서 한 번 배치하면 교사 조건을 기억하므로, 같은 USB를 이 컴퓨터에 꽂으면 교사 조건은 지켜집니다(학생 요청은 반영되지 않습니다).</td></tr>
+  <tr><td>"명단.xlsx를 읽을 수 없어요" / "명단을 저장할 수 없어요"</td><td>엑셀에서 명단을 닫고 다시 시도하세요.</td></tr>
+  <tr><td>반 폴더 이름을 바꿨더니 교실 모양이 처음으로 돌아갔어요</td><td>교실 모양과 직전 자리는 반 이름으로 기억합니다. 이름을 바꾸면 새로 시작합니다.</td></tr>
+  <tr><td>창 크기를 바꾸고 싶어요</td><td>프로그램은 전자칠판에 맞춰 전체 화면으로 열립니다.</td></tr>
+</table>
+
+<div class="warn">
+  <b>비밀 지키기</b>: 교사 조건은 화면에 나오지 않지만, <span class="file">Settings.ini</span> 파일을 전자칠판에서 열면 학생들이 볼 수 있습니다. 조건은 학생이 없을 때 고쳐 주세요.
+</div>
+
+<footer>자리배치 · Copyright © aa_sae__ · MIT License (무료 배포·수정 가능)</footer>
+</body>
+</html>

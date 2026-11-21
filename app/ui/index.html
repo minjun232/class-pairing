@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>자리배치</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 상단 탭 (반 선택 화면에서는 숨김) -->
+  <nav id="nav" hidden>
+    <button class="nav-class" data-go="class" id="nav-classname">반</button>
+    <div class="tabs">
+      <button data-go="roster">명단</button>
+      <button data-go="room">교실</button>
+      <button data-go="req">요청</button>
+      <button data-go="seat">자리 배치</button>
+    </div>
+    <span id="model-status" class="model-status"></span>
+    <button class="quit" data-action="quit" aria-label="끝내기">끝내기</button>
+  </nav>
+
+  <!-- ① 반 선택 -->
+  <section id="screen-class" class="screen">
+    <div class="class-box">
+      <h1>자리배치</h1>
+      <div id="class-list" class="class-list"></div>
+      <div class="class-add">
+        <input id="new-class" type="text" placeholder="새 반 이름 (예: 2-3)" maxlength="40">
+        <button id="btn-add-class" class="secondary">반 추가</button>
+      </div>
+      <p id="class-msg" class="msg"></p>
+      <button id="btn-open-class" class="primary big">시작</button>
+    </div>
+    <button class="quit corner" data-action="quit">끝내기</button>
+    <span id="model-status-2" class="model-status corner-left"></span>
+  </section>
+
+  <!-- 명단 입력 -->
+  <section id="screen-roster" class="screen" hidden>
+    <p class="hint">한 줄에 한 명씩 적어 주세요. 엑셀이나 나이스에서 이름을 복사해 붙여 넣어도 돼요.</p>
+    <div class="roster-cols">
+      <label class="roster-col">
+        <span class="label">남 <b id="count-m">0</b>명</span>
+        <textarea id="roster-m" spellcheck="false"></textarea>
+      </label>
+      <label class="roster-col">
+        <span class="label">여 <b id="count-f">0</b>명</span>
+        <textarea id="roster-f" spellcheck="false"></textarea>
+      </label>
+    </div>
+    <div class="bottom-bar">
+      <p id="roster-msg" class="msg"></p>
+      <button id="btn-save-roster" class="primary">저장</button>
+    </div>
+  </section>
+
+  <!-- ② 교실 설정 -->
+  <section id="screen-room" class="screen" hidden>
+    <div class="toolbar">
+      <div class="group">
+        <span class="label">배치</span>
+        <div class="seg" id="preset">
+          <button data-v="pair">짝</button>
+          <button data-v="single">단독</button>
+          <button data-v="group">모둠</button>
+        </div>
+        <div class="stepper" id="group-size-box">
+          <button data-step="-1" aria-label="모둠 인원 줄이기">−</button>
+          <span id="group-size">4</span>
+          <button data-step="1" aria-label="모둠 인원 늘리기">+</button>
+        </div>
+      </div>
+      <div class="group" id="gender-box">
+        <span class="label">성별</span>
+        <div class="seg" id="gender">
+          <button data-v="any">무관</button>
+          <button data-v="mixed" id="gender-mixed">남녀 짝</button>
+        </div>
+      </div>
+      <div class="group">
+        <span class="label">줄</span>
+        <div class="stepper" id="rows-box">
+          <button data-step="-1" aria-label="줄 줄이기">−</button>
+          <span id="rows">5</span>
+          <button data-step="1" aria-label="줄 늘리기">+</button>
+        </div>
+        <span class="label">열</span>
+        <div class="stepper" id="cols-box">
+          <button data-step="-1" aria-label="열 줄이기">−</button>
+          <span id="cols">6</span>
+          <button data-step="1" aria-label="열 늘리기">+</button>
+        </div>
+      </div>
+      <span id="room-count" class="count"></span>
+      <button id="btn-room-prev" class="secondary" hidden>현재 배치 보기</button>
+    </div>
+    <p id="room-msg" class="msg warn"></p>
+    <div class="room-wrap">
+      <div class="side-label left">창문</div>
+      <div class="room-center">
+        <div class="front-row"><span class="podium">교탁</span><span class="board">칠판</span><span class="door">앞문</span></div>
+        <div id="room-grid" class="grid editable"></div>
+        <div class="back-row"><span class="door">뒷문</span></div>
+      </div>
+      <div class="side-label right"></div>
+    </div>
+    <p class="hint">칸을 누르면 자리 → 빈자리 → 통로 순서로 바뀌어요.</p>
+  </section>
+
+  <!-- ③ 학생 요청 -->
+  <section id="screen-req" class="screen" hidden>
+    <p id="req-msg" class="msg warn"></p>
+    <div id="req-list" class="req-list"></div>
+    <div class="bottom-bar">
+      <span id="req-saved" class="saved"></span>
+      <button id="btn-save-req" class="primary">저장</button>
+    </div>
+  </section>
+
+  <!-- ④ 자리 배치와 공개 -->
+  <section id="screen-seat" class="screen" hidden>
+    <div class="seat-main">
+      <div class="seat-room">
+        <p id="seat-caption" class="seat-caption" hidden></p>
+        <div class="board-bar">칠판</div>
+        <div id="seat-grid" class="grid"></div>
+      </div>
+      <aside id="name-list" class="name-list" hidden></aside>
+    </div>
+    <div class="bottom-bar">
+      <p id="seat-msg" class="msg"></p>
+      <button id="btn-show-prev" class="secondary" hidden>현재 배치 보기</button>
+      <button id="btn-arrange" class="primary big">자리 배치</button>
+      <button id="btn-reveal-all" class="secondary" hidden>전체 공개</button>
+      <button id="btn-rearrange" class="secondary" hidden>다시 배치</button>
+      <button id="btn-edit" class="secondary" hidden>편집</button>
+      <button id="btn-word" class="primary" hidden>Word로 저장</button>
+    </div>
+  </section>
+
+  <!-- 확인 창 -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-box">
+      <div id="modal-text" class="modal-text"></div>
+      <div class="modal-buttons">
+        <button id="modal-cancel" class="secondary">취소</button>
+        <button id="modal-ok" class="primary">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 알림 -->
+  <div id="toast" class="toast" hidden>
+    <span id="toast-text"></span>
+    <button id="toast-action" class="link" hidden>폴더 열기</button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
