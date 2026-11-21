@@ -63,7 +63,11 @@ impl Cues {
             choice: CHOICE.iter().any(|w| text.contains(w)),
             zone_cues: std::array::from_fn(|i| {
                 let (zone, words) = ZONE_CUES[i];
-                words.iter().any(|w| text.contains(w)) || (zone.ends_with("문근처") && DOOR.iter().any(|w| text.contains(w)))
+                // "문 근처"처럼 어느 문인지 말하지 않았을 때만 두 문 모두 허용 ("앞문 옆"의 "문 옆"은 앞문만)
+                // "창문 쪽"의 "문 쪽"은 문이 아니다
+                let t = text.replace("창문", "");
+                let any_door = DOOR.iter().any(|w| t.contains(w)) && !t.contains("앞문") && !t.contains("뒷문");
+                words.iter().any(|w| text.contains(w)) || (zone.ends_with("문근처") && any_door)
             }),
         }
     }
@@ -154,6 +158,8 @@ mod tests {
         assert!(door.zone_ok("앞문근처") && door.zone_ok("뒷문근처"));
         let front = Cues::find(" 앞문 옆");
         assert!(front.zone_ok("앞문근처") && !front.zone_ok("뒷문근처"));
+        let window = Cues::find(" 창문 쪽");
+        assert!(window.zone_ok("창가") && !window.zone_ok("앞문근처"));
     }
 
     #[test]
