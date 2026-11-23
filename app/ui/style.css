@@ -245,6 +245,9 @@ nav .tabs button.active { background: var(--accent-soft); color: var(--accent); 
 
 .bottom-bar { display: flex; align-items: center; justify-content: center; gap: 1em; padding-top: 1.2vh; flex-wrap: wrap; }
 .bottom-bar .msg { margin: 0 1em 0 0; }
+/* 한 자리에 버튼 두 개를 겹쳐 두고 하나만 보인다 (너비는 긴 쪽에 맞춤) */
+.slot { display: inline-grid; }
+.slot > * { grid-area: 1 / 1; }
 .saved { color: var(--ink-soft); }
 
 /* ---------- 명단 입력 ---------- */

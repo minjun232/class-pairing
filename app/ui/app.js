@@ -476,12 +476,18 @@ function renderSeatButtons() {
   $('#btn-arrange').hidden = a;
   $('#btn-arrange').textContent = prevMode ? '새로 배치' : '자리 배치';
   $('#btn-show-prev').hidden = a || prevMode || !S.view.previous_date;
-  $('#btn-reveal-all').hidden = !a || all;
-  $('#btn-rearrange').hidden = !a || S.confirmed;
-  $('#btn-edit-req').hidden = !a || S.confirmed;
-  $('#btn-edit').hidden = !a || !all || S.confirmed;
+  // 배치 후에는 버튼 자리를 고정하고 보이기만 바꾼다 (버튼이 움직이면 누르기 불편)
+  const keep = (id, inBar, show) => {
+    $(id).hidden = !inBar;
+    $(id).style.visibility = show ? '' : 'hidden';
+  };
+  keep('#btn-edit-req', a, !S.confirmed);
+  keep('#btn-rearrange', a, !S.confirmed);
+  keep('#slot-reveal-edit', a, true);
+  keep('#btn-reveal-all', true, a && !all);
+  keep('#btn-edit', true, a && all && !S.confirmed);
   $('#btn-edit').textContent = S.editing ? '편집 끝' : '편집';
-  $('#btn-word').hidden = !(prevMode || (a && all));
+  keep('#btn-word', a || prevMode, prevMode || all);
 }
 
 function reveal(i) {

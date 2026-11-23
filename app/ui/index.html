@@ -141,10 +141,13 @@
       <p id="seat-msg" class="msg"></p>
       <button id="btn-show-prev" class="secondary" hidden>현재 배치 보기</button>
       <button id="btn-arrange" class="primary big">자리 배치</button>
-      <button id="btn-reveal-all" class="secondary" hidden>전체 공개</button>
+      <!-- 배치 후 버튼은 자리를 고정한다 (보이기만 바꿈). 전체 공개와 편집은 같은 자리를 번갈아 쓴다 -->
       <button id="btn-edit-req" class="secondary" hidden>요청 수정</button>
       <button id="btn-rearrange" class="secondary" hidden>다시 배치</button>
-      <button id="btn-edit" class="secondary" hidden>편집</button>
+      <span id="slot-reveal-edit" class="slot" hidden>
+        <button id="btn-reveal-all" class="secondary">전체 공개</button>
+        <button id="btn-edit" class="secondary">편집</button>
+      </span>
       <button id="btn-word" class="primary" hidden>Word로 저장</button>
     </div>
   </section>
