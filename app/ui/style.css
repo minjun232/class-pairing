@@ -172,6 +172,9 @@ nav .tabs button.active { background: var(--accent-soft); color: var(--accent); 
   box-shadow: 0 .3vh .8vh rgba(30, 41, 59, .08);
 }
 .cell.blank .desk { background: repeating-linear-gradient(-45deg, #f1f3f7 0 8px, #e7ebf1 8px 16px); border-style: dashed; }
+/* 남녀 짝 자리 표시 (교실 설정 화면만): 연한 색 */
+.cell.seat.male .desk { background: #e3edfb; border-color: #c9dbf5; }
+.cell.seat.female .desk { background: #fbe7ee; border-color: #f3cfdc; }
 .cell.aisle { }
 .grid.editable .cell { cursor: pointer; }
 .grid.editable .cell.aisle { border: 2px dashed #e2e6ee; border-radius: var(--radius); }

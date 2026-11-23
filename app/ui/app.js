@@ -247,7 +247,8 @@ function renderRoom() {
   $('#room-msg').textContent = S.view.roster_error || (n > seats ? `자리가 ${n - seats}개 부족해요` : '');
   drawGrid($('#room-grid'), S.layout, (cell) => {
     if (cell.kind === 'blank') cell.node.append(el('span', 'tag', '빈자리'));
-    if (sides && cell.kind === 'seat') cell.node.append(el('span', 'tag', maleCell(S.layout, cell.row, cell.col) ? '남' : '여'));
+    // 남녀 짝: 남학생 자리는 연한 파랑, 여학생 자리는 연한 분홍
+    if (sides && cell.kind === 'seat') cell.node.classList.add(maleCell(S.layout, cell.row, cell.col) ? 'male' : 'female');
     cell.node.onclick = () => cycleCell(cell.row, cell.col, cell.kind);
   });
   fitAll();
