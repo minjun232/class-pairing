@@ -48,7 +48,24 @@ function show(screen) {
 // 진행 단계: 요청 → 배치 → 공개 → 확정
 function renderSteps() {
   const step = S.screen === 'req' ? 0 : !S.arranged ? 1 : S.confirmed ? 3 : 2;
-  $$('#steps li').forEach((li, i) => li.classList.toggle('on', i === step));
+  const a = !!S.arranged;
+  const reading = (S.status?.pending ?? 0) > 0;
+  // 각 단계로 갈 수 있는지: 요청(확정 전), 배치(배치가 있거나 읽는 중이 아님), 공개(배치 있음), 확정(모두 공개)
+  const can = [!S.confirmed, a || !(reading || S.arranging), a, a && allRevealed() && !S.confirmed];
+  $$('#steps button').forEach((b, i) => {
+    b.classList.toggle('on', i === step);
+    b.disabled = i !== step && !can[i];
+  });
+}
+
+async function goStep(i) {
+  const step = S.screen === 'req' ? 0 : !S.arranged ? 1 : S.confirmed ? 3 : 2;
+  if (i === step) return;
+  if (i === 0) return go('req');
+  if (i === 1 && !S.arranged) return arrange();
+  if (i === 3) return saveWord();
+  show('seat');
+  renderSeat();
 }
 
 // 준비가 끝났는지 (명단 있음, 자리가 충분함). 부족하면 이유, 끝났으면 null
@@ -134,6 +151,7 @@ async function pollStatus() {
 function syncArrangeButtons() {
   const off = S.arranging || (S.status?.pending ?? 0) > 0;
   ['#btn-arrange', '#btn-rearrange', '#btn-req-next'].forEach((b) => ($(b).disabled = off));
+  renderSteps();
 }
 
 // ---------------------------------------------------------------- ① 반 선택
@@ -681,6 +699,7 @@ function setup() {
   // 교실 설정으로 돌아간다 (요청은 go()가 저장해 두므로 그대로 남는다)
   $('#btn-req-back').onclick = () => go('room');
   $('#btn-start').onclick = startArranging;
+  $$('#steps button').forEach((b) => (b.onclick = () => goStep(Number(b.dataset.step))));
   $('#btn-arrange').onclick = arrange;
   $('#btn-rearrange').onclick = arrange;
   $('#btn-reveal-all').onclick = () => {
