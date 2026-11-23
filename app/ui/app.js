@@ -237,7 +237,9 @@ function renderRoom() {
   $('#gender-box').hidden = c.preset === 'single';
   $('#gender-mixed').textContent = GENDER_LABEL[c.preset] || '';
   const sides = c.preset === 'pair' && c.gender === 'mixed';
-  $('#btn-swap-gender').hidden = !sides;
+  $('#gender-order').hidden = !sides;
+  const order = c.male_left === false ? 'fm' : 'mf';
+  $$('#gender-order button').forEach((b) => b.classList.toggle('on', b.dataset.v === order));
   $('#rows').textContent = c.rows;
   $('#cols').textContent = c.cols;
   const n = S.view.students.length;
@@ -304,10 +306,12 @@ function setupRoomControls() {
     saveRoom();
   }));
   $$('#gender button').forEach((b) => (b.onclick = () => { S.classroom.gender = b.dataset.v; saveRoom(); }));
-  $('#btn-swap-gender').onclick = () => {
-    S.classroom.male_left = S.classroom.male_left === false;
+  $$('#gender-order button').forEach((b) => (b.onclick = () => {
+    const male_left = b.dataset.v === 'mf';
+    if ((S.classroom.male_left !== false) === male_left) return;
+    S.classroom.male_left = male_left;
     saveRoom();
-  };
+  }));
   const stepper = (box, key, min, max) => $$(box + ' button').forEach((b) => (b.onclick = () => {
     const v = Math.min(max, Math.max(min, S.classroom[key] + Number(b.dataset.step)));
     if (v === S.classroom[key]) return;

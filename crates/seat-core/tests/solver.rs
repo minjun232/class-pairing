@@ -154,7 +154,7 @@ fn gender_sides_alternate_and_swap() {
     let row1: Vec<bool> = (1..=5).map(|c| l.male_cell(1, c)).collect();
     assert_eq!(row1, vec![true, false, true, false, true]);
     assert!(!l.male_cell(2, 5) && l.male_cell(2, 1));
-    // [남녀 자리 바꾸기]
+    // [여남] 토글
     let l = ClassroomConfig { preset: Preset::Pair, rows: 2, cols: 5, gender: GenderMode::Mixed, male_left: false, ..Default::default() }.build();
     assert!(!l.male_cell(1, 1) && l.male_cell(1, 2) && !l.male_cell(1, 5) && l.male_cell(2, 5));
     // 배치 결과도 자리 성별을 따른다 (남5·여5, 10자리)

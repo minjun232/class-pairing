@@ -81,7 +81,11 @@
           <button data-v="any">무관</button>
           <button data-v="mixed" id="gender-mixed">남녀 짝</button>
         </div>
-        <button id="btn-swap-gender" class="secondary" hidden>남녀 자리 바꾸기</button>
+        <!-- 남녀 짝: 1열부터 남·여 순서인지 여·남 순서인지 -->
+        <div class="seg" id="gender-order" hidden>
+          <button data-v="mf" aria-label="1열 남학생부터"><span class="chip male"></span><span class="chip female"></span></button>
+          <button data-v="fm" aria-label="1열 여학생부터"><span class="chip female"></span><span class="chip male"></span></button>
+        </div>
       </div>
       <div class="group">
         <span class="label">줄</span>

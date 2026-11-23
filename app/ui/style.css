@@ -175,6 +175,14 @@ nav .tabs button.active { background: var(--accent-soft); color: var(--accent); 
 /* 남녀 짝 자리 표시 (교실 설정 화면만): 연한 색 */
 .cell.seat.male .desk { background: #e3edfb; border-color: #c9dbf5; }
 .cell.seat.female .desk { background: #fbe7ee; border-color: #f3cfdc; }
+/* [남녀 순서] 토글: 글씨 없이 색 조각 두 개 */
+#gender-order button { display: inline-flex; align-items: center; gap: 3px; }
+/* 선택된 칸은 진한 색으로 채우지 않고 흰 칸을 띄운다 (Astryx SegmentedControl 방식, 색 칩이 묻히지 않게) */
+#gender-order { background: #eef1f6; }
+#gender-order button.on { background: #fff; box-shadow: 0 1px 3px rgba(30, 41, 59, .18); }
+.chip { display: inline-block; width: 1.1em; height: 1.1em; border-radius: 4px; }
+.chip.male { background: #e3edfb; border: 1.5px solid #9fbde8; }
+.chip.female { background: #fbe7ee; border: 1.5px solid #e9a9c0; }
 .cell.aisle { }
 .grid.editable .cell { cursor: pointer; }
 .grid.editable .cell.aisle { border: 2px dashed #e2e6ee; border-radius: var(--radius); }
