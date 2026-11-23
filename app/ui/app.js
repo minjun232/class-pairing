@@ -235,6 +235,8 @@ function renderRoom() {
 async function saveRoom() {
   try {
     S.layout = await invoke('set_classroom', { classroom: S.classroom });
+    // 교실 모양이 바뀌면 확정 전 배치는 옛 교실 기준이므로 버린다 ([배치로 돌아가기]로 옛 모양이 나오지 않게)
+    if (inProgress()) resetSeat();
   } catch (e) { $('#room-msg').textContent = e; }
   syncStart();
   renderRoom();
@@ -476,6 +478,7 @@ function renderSeatButtons() {
   $('#btn-show-prev').hidden = a || prevMode || !S.view.previous_date;
   $('#btn-reveal-all').hidden = !a || all;
   $('#btn-rearrange').hidden = !a || S.confirmed;
+  $('#btn-edit-req').hidden = !a || S.confirmed;
   $('#btn-edit').hidden = !a || !all || S.confirmed;
   $('#btn-edit').textContent = S.editing ? '편집 끝' : '편집';
   $('#btn-word').hidden = !(prevMode || (a && all));
@@ -617,6 +620,9 @@ async function saveRoster() {
   const split = (t) => lines(t.replace(/\t/g, '\n'));
   try {
     applyView(await invoke('save_roster', { males: split($('#roster-m').value), females: split($('#roster-f').value) }));
+    // 명단이 바뀌면 확정 전 배치도 버린다
+    if (inProgress()) resetSeat();
+    syncStart();
     renderRoster();
     $('#roster-msg').textContent = `저장했어요 (${S.view.students.length}명)`;
     // 저장하면 다음 할 일(교실 설정)로 가는 버튼을 보여 준다
@@ -664,6 +670,8 @@ function setup() {
   $('#btn-open-class').onclick = openSelected;
   $('#btn-save-req').onclick = saveRequests;
   $('#btn-req-next').onclick = arrange;
+  // 배치 후 요청을 고치고 [자리 배치]로 다시 배치한다 (확정 전까지)
+  $('#btn-edit-req').onclick = () => go('req');
   // 교실 설정으로 돌아간다 (요청은 go()가 저장해 두므로 그대로 남는다)
   $('#btn-req-back').onclick = () => go('room');
   $('#btn-start').onclick = startArranging;

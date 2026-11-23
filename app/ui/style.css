@@ -86,7 +86,15 @@ nav .nav-start, nav .steps { margin-left: auto; margin-right: auto; }
 .steps { display: flex; gap: .4em; list-style: none; padding: 0; margin: 0; font-size: .9em; color: var(--ink-soft); }
 /* 순서는 보여 주지 않고 지금 단계 이름만 */
 .steps li:not(.on) { display: none; }
-.steps li.on { color: var(--accent); font-weight: 800; }
+/* 버튼처럼 배경을 깔지 않고, 작은 "현재 단계" 표시 + 큰 글씨 + 밑줄로 드러낸다 */
+.steps li.on {
+  color: var(--accent); font-weight: 800; font-size: 1.35em;
+  border-bottom: 3px solid var(--accent); padding: 0 .15em .05em;
+}
+.steps li.on::before {
+  content: '현재 단계'; margin-right: .6em;
+  font-size: .5em; font-weight: 600; color: var(--ink-soft); vertical-align: middle;
+}
 nav .tabs button { font-weight: 600; color: var(--ink-soft); }
 nav .tabs button.active { background: var(--accent-soft); color: var(--accent); }
 .model-status { font-size: .75em; color: var(--ink-soft); white-space: nowrap; }
