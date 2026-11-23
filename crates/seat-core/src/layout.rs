@@ -49,6 +49,9 @@ pub struct ClassroomConfig {
     pub cols: u32,
     pub group_size: u32,
     pub gender: GenderMode,
+    /// 남녀 짝일 때 책상의 왼쪽(창문 쪽) 자리가 남학생 자리인지. false면 오른쪽이 남학생 자리.
+    #[serde(default = "default_true")]
+    pub male_left: bool,
     /// 자리가 아닌 칸(빈자리·통로) 목록. 좌표는 논리 격자 기준 (줄, 열), 1부터.
     #[serde(default)]
     pub edits: Vec<CellEdit>,
@@ -69,9 +72,14 @@ impl Default for ClassroomConfig {
             cols: 6,
             group_size: 4,
             gender: GenderMode::Any,
+            male_left: true,
             edits: Vec::new(),
         }
     }
+}
+
+fn default_true() -> bool {
+    true
 }
 
 pub const MIN_GROUP_SIZE: u32 = 3;
@@ -116,6 +124,8 @@ pub struct Seat {
 pub struct Layout {
     pub preset: Preset,
     pub gender: GenderMode,
+    /// 남녀 짝일 때 책상 왼쪽 자리가 남학생 자리인지 ([`ClassroomConfig::male_left`])
+    pub male_left: bool,
     /// 논리 격자 크기
     pub rows: u32,
     pub cols: u32,
@@ -186,6 +196,7 @@ impl Layout {
         Layout {
             preset: cfg.preset,
             gender: cfg.gender,
+            male_left: cfg.male_left,
             rows,
             cols,
             cells,
@@ -195,6 +206,14 @@ impl Layout {
             group_h,
             group_cols,
         }
+    }
+
+    /// 남녀 짝: 이 칸이 남학생 자리인지.
+    /// 열마다 남·여가 번갈아 오고(1열이 남이면 `male_left`), 짝이 없는 마지막 열(열 수가 홀수)은 줄마다 번갈아 온다.
+    pub fn male_cell(&self, row: u32, col: u32) -> bool {
+        let alone = self.cols % 2 == 1 && col == self.cols;
+        let odd = if alone { row % 2 == 1 } else { col % 2 == 1 };
+        odd == self.male_left
     }
 
     pub fn cell(&self, row: u32, col: u32) -> CellKind {

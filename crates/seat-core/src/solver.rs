@@ -91,6 +91,8 @@ struct Compiled<'a> {
     units: Vec<Vec<usize>>,
     gender_on: bool,
     male_ratio: (u64, u64),
+    /// 남녀 짝: 자리마다 남학생 자리인지 (`Layout::male_cell`)
+    seat_male: Vec<bool>,
 }
 
 /// 규칙 하나를 내부 조건으로 바꾼다. 명단에 없는 이름이면 None.
@@ -168,12 +170,10 @@ impl<'a> Compiled<'a> {
         if self.gender_on {
             match l.preset {
                 Preset::Pair => {
-                    for u in &self.units {
-                        if u.len() == 2 {
-                            let (x, y) = (occ[u[0]], occ[u[1]]);
-                            if x < self.n && y < self.n && self.gender[x] == self.gender[y] {
-                                c[2] += 1;
-                            }
+                    // 남녀 짝: 자리마다 정해진 성별(열마다 번갈아)과 다른 학생 수
+                    for (s, &e) in occ.iter().enumerate() {
+                        if e < self.n && (self.gender[e] == Gender::Male) != self.seat_male[s] {
+                            c[2] += 1;
                         }
                     }
                 }
@@ -282,6 +282,7 @@ pub fn solve<R: Rng + ?Sized>(p: &Problem, rng: &mut R) -> Result<Arrangement, S
         units: layout.units(),
         gender_on,
         male_ratio: (males, n.max(1) as u64),
+        seat_male: layout.seats.iter().map(|s| layout.male_cell(s.row, s.col)).collect(),
     };
 
     if n == 0 {

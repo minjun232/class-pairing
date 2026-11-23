@@ -132,15 +132,39 @@ fn fairness_with_gender_mixing() {
     // 남녀 짝을 켜도 특정 학생이 특정 자리에 몰리면 안 된다.
     let layout = pair_layout(2, 4, GenderMode::Mixed);
     let st = students(4, 4);
+    // 남0은 남학생 자리(1·3열, 4곳)에만 앉고, 그 안에서는 고르게 앉아야 한다.
     let runs = 4000;
     let mut count = vec![0u32; 8];
     for seed in 0..runs {
         let arr = solve_with(&layout, &st, &[], &[], &[], seed).unwrap();
         count[arr.seat_of[0]] += 1;
     }
-    let exp = runs as f64 / 8.0;
-    let chi2: f64 = count.iter().map(|&c| (c as f64 - exp).powi(2) / exp).sum();
-    assert!(chi2 < 24.3, "chi2={chi2} {count:?}"); // 자유도 7
+    let male: Vec<u32> = (0..8).filter(|&i| layout.male_cell(layout.seats[i].row, layout.seats[i].col)).map(|i| count[i]).collect();
+    assert_eq!(male.len(), 4);
+    assert_eq!(male.iter().sum::<u32>(), runs as u32, "여학생 자리에 앉으면 안 됨: {count:?}");
+    let exp = runs as f64 / 4.0;
+    let chi2: f64 = male.iter().map(|&c| (c as f64 - exp).powi(2) / exp).sum();
+    assert!(chi2 < 16.3, "chi2={chi2} {count:?}"); // 자유도 3
+}
+
+#[test]
+fn gender_sides_alternate_and_swap() {
+    // 5열: 1~4열은 남·여·남·여, 짝 없는 5열은 줄마다 남·여
+    let l = pair_layout(2, 5, GenderMode::Mixed);
+    let row1: Vec<bool> = (1..=5).map(|c| l.male_cell(1, c)).collect();
+    assert_eq!(row1, vec![true, false, true, false, true]);
+    assert!(!l.male_cell(2, 5) && l.male_cell(2, 1));
+    // [남녀 자리 바꾸기]
+    let l = ClassroomConfig { preset: Preset::Pair, rows: 2, cols: 5, gender: GenderMode::Mixed, male_left: false, ..Default::default() }.build();
+    assert!(!l.male_cell(1, 1) && l.male_cell(1, 2) && !l.male_cell(1, 5) && l.male_cell(2, 5));
+    // 배치 결과도 자리 성별을 따른다 (남5·여5, 10자리)
+    let st = students(5, 5);
+    for seed in 0..10 {
+        let arr = solve_with(&l, &st, &[], &[], &[], seed).unwrap();
+        for (i, &s) in arr.seat_of.iter().enumerate() {
+            assert_eq!(l.male_cell(l.seats[s].row, l.seats[s].col), st[i].gender == Gender::Male);
+        }
+    }
 }
 
 fn same_gender_desks(layout: &Layout, st: &[Student], arr: &Arrangement) -> usize {

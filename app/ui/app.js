@@ -236,6 +236,8 @@ function renderRoom() {
   $('#group-size').textContent = c.group_size;
   $('#gender-box').hidden = c.preset === 'single';
   $('#gender-mixed').textContent = GENDER_LABEL[c.preset] || '';
+  const sides = c.preset === 'pair' && c.gender === 'mixed';
+  $('#btn-swap-gender').hidden = !sides;
   $('#rows').textContent = c.rows;
   $('#cols').textContent = c.cols;
   const n = S.view.students.length;
@@ -245,9 +247,18 @@ function renderRoom() {
   $('#room-msg').textContent = S.view.roster_error || (n > seats ? `자리가 ${n - seats}개 부족해요` : '');
   drawGrid($('#room-grid'), S.layout, (cell) => {
     if (cell.kind === 'blank') cell.node.append(el('span', 'tag', '빈자리'));
+    if (sides && cell.kind === 'seat') cell.node.append(el('span', 'tag', maleCell(S.layout, cell.row, cell.col) ? '남' : '여'));
     cell.node.onclick = () => cycleCell(cell.row, cell.col, cell.kind);
   });
   fitAll();
+}
+
+// 남녀 짝: 이 칸이 남학생 자리인지 (seat-core `Layout::male_cell`과 같은 규칙)
+// 열마다 남·여가 번갈아 오고, 짝이 없는 마지막 열은 줄마다 번갈아 온다.
+function maleCell(layout, row, col) {
+  const alone = layout.cols % 2 === 1 && col === layout.cols;
+  const odd = (alone ? row : col) % 2 === 1;
+  return odd === (layout.male_left !== false);
 }
 
 async function saveRoom() {
@@ -292,6 +303,10 @@ function setupRoomControls() {
     saveRoom();
   }));
   $$('#gender button').forEach((b) => (b.onclick = () => { S.classroom.gender = b.dataset.v; saveRoom(); }));
+  $('#btn-swap-gender').onclick = () => {
+    S.classroom.male_left = S.classroom.male_left === false;
+    saveRoom();
+  };
   const stepper = (box, key, min, max) => $$(box + ' button').forEach((b) => (b.onclick = () => {
     const v = Math.min(max, Math.max(min, S.classroom[key] + Number(b.dataset.step)));
     if (v === S.classroom[key]) return;
