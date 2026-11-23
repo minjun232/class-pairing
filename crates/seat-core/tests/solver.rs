@@ -148,6 +148,43 @@ fn fairness_with_gender_mixing() {
 }
 
 #[test]
+fn two_back_requests_not_always_paired() {
+    // 남녀 짝 6×6, 34명 → 빈자리 2개(6줄 5·6열). 맨 뒷줄에 남은 자리는 1~4열(남1·3, 여2·4열).
+    // 남0·여0이 둘 다 "맨 뒤"를 원하면, 같은 책상이 되는 경우는 (1,2)·(3,4) 두 가지뿐 → 약 절반이어야 한다.
+    let layout = pair_layout(6, 6, GenderMode::Mixed);
+    let st = students(17, 17);
+    let back = |who: &str| (who.to_string(), vec![Rule::Allowed { student: who.into(), place: Place::Zone(Zone::BackMost) }]);
+    let req = vec![back("남0"), back("여0")];
+    let runs = 200;
+    let mut paired = 0;
+    for seed in 0..runs {
+        let arr = solve_with(&layout, &st, &[], &req, &[], seed).unwrap();
+        assert_eq!(layout.seats[arr.seat_of[0]].row, 6);
+        assert_eq!(layout.seats[arr.seat_of[17]].row, 6);
+        if layout.distance(arr.seat_of[0], arr.seat_of[17]) == 0 {
+            paired += 1;
+        }
+    }
+    let ratio = paired as f64 / runs as f64;
+    assert!((0.3..0.7).contains(&ratio), "맨 뒤 요청 둘이 짝이 되는 비율 {ratio}");
+}
+
+#[test]
+fn window_request_keeps_gender_order() {
+    // 남녀 짝, 1열 = 남학생 열. 여학생의 "창가" 요청 → 창가 책상의 여학생 자리(2열). 순서는 그대로.
+    let layout = pair_layout(3, 4, GenderMode::Mixed);
+    let st = students(6, 6);
+    let req = vec![("여0".to_string(), vec![Rule::Allowed { student: "여0".into(), place: Place::Zone(Zone::Window) }])];
+    for seed in 0..20 {
+        let arr = solve_with(&layout, &st, &[], &req, &[], seed).unwrap();
+        assert_eq!(layout.seats[arr.seat_of[6]].col, 2, "여0은 창가 책상의 2열");
+        for (i, &s) in arr.seat_of.iter().enumerate() {
+            assert_eq!(layout.male_cell(layout.seats[s].row, layout.seats[s].col), st[i].gender == Gender::Male);
+        }
+    }
+}
+
+#[test]
 fn gender_sides_alternate_and_swap() {
     // 5열: 1~4열은 남·여·남·여, 짝 없는 5열은 줄마다 남·여
     let l = pair_layout(2, 5, GenderMode::Mixed);
@@ -274,7 +311,7 @@ fn requests_and_previous_pairs() {
     let prev = vec![("남2".to_string(), "여2".to_string()), ("남3".to_string(), "여3".to_string())];
     for seed in 0..20 {
         let arr = solve_with(&layout, &st, &[], &req, &prev, seed).unwrap();
-        assert_eq!(layout.seats[arr.seat_of[0]].col, 1);
+        assert!(layout.seats[arr.seat_of[0]].col <= 2, "짝 배치의 창가 = 1~2열 책상");
         assert_eq!(layout.distance(arr.seat_of[15], arr.seat_of[16]), 0);
         assert_ne!(layout.distance(arr.seat_of[2], arr.seat_of[17]), 0);
         assert_ne!(layout.distance(arr.seat_of[3], arr.seat_of[18]), 0);

@@ -4,7 +4,7 @@
 //! 자리 집합을 표현하고, 프로그램이 교실 모양에 맞춰 실제 자리 목록으로 바꾼다.
 //! 그래서 해석 결과는 교실 모양이 바뀌어도 다시 해석할 필요가 없다.
 
-use crate::layout::Layout;
+use crate::layout::{Layout, Preset};
 use serde::{Deserialize, Serialize};
 
 /// 애매한 표현의 구역.
@@ -121,8 +121,8 @@ impl Place {
             Place::Zone(zone) => match zone {
                 Zone::Front => row <= z.front(rows),
                 Zone::Back => row > rows - z.back(rows),
-                Zone::Window => col <= z.window(cols),
-                Zone::Hallway => col > cols - z.hallway(cols),
+                Zone::Window => col <= window_edge(layout, z),
+                Zone::Hallway => col >= hallway_edge(layout, z),
                 Zone::Center => {
                     let (lo, hi) = center_cols(cols);
                     col >= lo && col <= hi
@@ -145,7 +145,7 @@ impl Place {
                         row <= z.front(rows) && col >= lo && col <= hi
                     }
                     Facility::Podium => near_point(0, 1),
-                    Facility::Window => col <= z.window(cols),
+                    Facility::Window => col <= window_edge(layout, z),
                     Facility::FrontDoor => near_point(1, cols as i64 + 1),
                     Facility::BackDoor => near_point(rows as i64, cols as i64 + 1),
                 }
@@ -166,6 +166,26 @@ impl Place {
             .map(|(i, _)| i)
             .collect()
     }
+}
+
+/// 짝 배치에서 이 열이 속한 책상의 (첫 열, 끝 열). 1-2열, 3-4열 … 이 한 책상이고,
+/// 열 수가 홀수면 마지막 열은 혼자다.
+fn desk_of(layout: &Layout, col: u32) -> (u32, u32) {
+    let start = col - (col - 1) % 2;
+    (start, (start + 1).min(layout.cols))
+}
+
+/// 창가 = 왼쪽 몇 열. 짝 배치에서는 책상 단위로 넓힌다 (창가 1열 → 1~2열 책상).
+/// 남녀 짝에서 창가를 원한 여학생이 창가 책상의 여학생 자리에 앉을 수 있게.
+fn window_edge(layout: &Layout, z: &ZoneSettings) -> u32 {
+    let n = z.window(layout.cols);
+    if layout.preset == Preset::Pair { desk_of(layout, n).1 } else { n }
+}
+
+/// 복도 = 오른쪽 몇 열(이 열부터). 짝 배치에서는 책상 단위로 넓힌다.
+fn hallway_edge(layout: &Layout, z: &ZoneSettings) -> u32 {
+    let first = layout.cols - z.hallway(layout.cols) + 1;
+    if layout.preset == Preset::Pair { desk_of(layout, first).0 } else { first }
 }
 
 /// 가운데 열 범위: 가운데 1/3 (최소 1열)
@@ -195,8 +215,16 @@ mod tests {
         let z = ZoneSettings::default();
         assert_eq!(Place::Zone(Zone::Front).resolve(&l, &z).len(), 12);
         assert_eq!(Place::Zone(Zone::Back).resolve(&l, &z).len(), 12);
-        assert_eq!(Place::Zone(Zone::Window).resolve(&l, &z).len(), 6);
-        assert!(rc(&l, Place::Zone(Zone::Hallway).resolve(&l, &z)).iter().all(|&(_, c)| c == 6));
+        // 짝 배치: 창가·복도는 책상 단위 (1~2열, 5~6열)
+        assert_eq!(Place::Zone(Zone::Window).resolve(&l, &z).len(), 12);
+        assert!(rc(&l, Place::Zone(Zone::Window).resolve(&l, &z)).iter().all(|&(_, c)| c <= 2));
+        assert!(rc(&l, Place::Zone(Zone::Hallway).resolve(&l, &z)).iter().all(|&(_, c)| c >= 5));
+        // 열 수가 홀수면 마지막 열은 혼자 → 복도 = 그 열만
+        let odd = ClassroomConfig { preset: Preset::Pair, rows: 2, cols: 5, ..Default::default() }.build();
+        assert!(rc(&odd, Place::Zone(Zone::Hallway).resolve(&odd, &z)).iter().all(|&(_, c)| c == 5));
+        // 단독 배치는 지금처럼 열 단위
+        let single = ClassroomConfig { preset: Preset::Single, rows: 2, cols: 4, ..Default::default() }.build();
+        assert!(rc(&single, Place::Zone(Zone::Window).resolve(&single, &z)).iter().all(|&(_, c)| c == 1));
         assert!(rc(&l, Place::Zone(Zone::Center).resolve(&l, &z)).iter().all(|&(_, c)| c == 3 || c == 4));
         let z3 = ZoneSettings { front_rows: Some(3), ..Default::default() };
         assert_eq!(Place::Zone(Zone::Front).resolve(&l, &z3).len(), 18);
