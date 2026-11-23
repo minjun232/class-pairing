@@ -21,13 +21,6 @@
 | `crates/seat-storage` | 명단.xlsx, Settings.ini, 상태 파일, Word 출력 |
 | `app/` | Tauri 2 앱 (Windows 단일 exe) |
 
-## 개발
-```bash
-cargo test --workspace --release
-```
-
-Windows용 배포 파일은 GitHub Actions의 "배포 파일 만들기 (Windows)" 워크플로가 만듭니다. `v*` 태그를 push하면 Releases에 `jaribaechi-windows.zip`으로 올라갑니다.
-
 ## 라이선스
 [MIT License](LICENSE) — 누구나 무료로 쓰고, 고치고, 다시 배포할 수 있습니다. 함께 배포하는 모델(Qwen2.5, Apache 2.0)과 라이브러리의 라이선스는 배포 파일의 `system/LICENSE`에 있습니다.
 
